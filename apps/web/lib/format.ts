@@ -25,10 +25,20 @@ export function formatSignedMoney(value: string, currency = 'USD'): string {
   return Number(value) > 0 ? `+${formatted}` : formatted;
 }
 
-export function formatPercent(value: string | null, fractionDigits = 2): string {
+/**
+ * `signed` defaults to true because most percentages here are outcomes, which
+ * read as gains and losses. Risk and win rate are magnitudes, not outcomes, so
+ * they pass false — a "+0.25%" risk would imply a direction it does not have.
+ */
+export function formatPercent(
+  value: string | null,
+  fractionDigits = 2,
+  options: { signed?: boolean } = {},
+): string {
   if (value === null) return '—';
   const percent = Number(value) * 100;
-  const sign = percent > 0 ? '+' : '';
+  const signed = options.signed ?? true;
+  const sign = signed && percent > 0 ? '+' : '';
   return `${sign}${percent.toFixed(fractionDigits)}%`;
 }
 

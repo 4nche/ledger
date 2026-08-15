@@ -52,7 +52,13 @@ async function request<TData>(path: string, init?: RequestInit): Promise<ApiResp
   try {
     response = await fetch(urlFor(path), {
       ...init,
-      headers: { 'content-type': 'application/json', ...init?.headers },
+      headers: {
+        // Only declare a JSON body when there is one. Fastify rejects an empty
+        // body sent with a JSON content-type, which would turn every DELETE
+        // into a 400.
+        ...(init?.body === undefined ? {} : { 'content-type': 'application/json' }),
+        ...init?.headers,
+      },
       cache: 'no-store',
     });
   } catch (cause) {

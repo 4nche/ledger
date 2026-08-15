@@ -137,6 +137,44 @@ export function localDayRange(
   };
 }
 
+const LOCAL_DATE_TIME_PATTERN = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/;
+
+/**
+ * Reads a wall-clock string as it was meant in the reporting timezone.
+ *
+ * A trader typing "10:31" means 10:31 where they trade, which is not
+ * necessarily where the browser or the server happens to be. Interpreting it in
+ * the machine's zone would silently shift the execution — and with it, which
+ * day the PnL lands in.
+ */
+export function instantFromLocalDateTime(value: string, timeZone: string): Date {
+  const match = LOCAL_DATE_TIME_PATTERN.exec(value);
+  if (match === null) {
+    throw new TypeError(
+      `Expected a local date and time in YYYY-MM-DDTHH:mm form, got ${JSON.stringify(value)}.`,
+    );
+  }
+
+  const zoned = new TZDate(
+    Number(match[1]),
+    Number(match[2]) - 1,
+    Number(match[3]),
+    Number(match[4]),
+    Number(match[5]),
+    Number(match[6] ?? 0),
+    0,
+    timeZone,
+  );
+  return new Date(zoned.getTime());
+}
+
+/** The inverse: an instant rendered as wall-clock time, ready for an input. */
+export function localDateTimeFromInstant(instant: Date, timeZone: string): string {
+  const zoned = new TZDate(instant.getTime(), timeZone);
+  const date = `${zoned.getFullYear()}-${pad2(zoned.getMonth() + 1)}-${pad2(zoned.getDate())}`;
+  return `${date}T${pad2(zoned.getHours())}:${pad2(zoned.getMinutes())}`;
+}
+
 /**
  * Splits realized events into one group per period, newest group first, with
  * items inside each group newest first. The input array is not mutated.

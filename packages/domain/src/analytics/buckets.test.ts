@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { groupByPeriod, localDayRange, periodKey, summarize } from './buckets';
+import {
+  groupByPeriod,
+  instantFromLocalDateTime,
+  localDateTimeFromInstant,
+  localDayRange,
+  periodKey,
+  summarize,
+} from './buckets';
 import type { RealizedEvent } from '../types';
 
 const AMS = 'Europe/Amsterdam';
@@ -237,5 +244,50 @@ describe('localDayRange — turning date filters into instants', () => {
 
   it('rejects a malformed date rather than producing an Invalid Date', () => {
     expect(() => localDayRange('15-08-2026', null, AMS)).toThrow(/YYYY-MM-DD/);
+  });
+});
+
+describe('local wall-clock <-> instant', () => {
+  it('reads a typed time as the reporting zone, not the machine’s zone', () => {
+    // 10:31 on 15 Aug in Amsterdam (CEST, UTC+2) is 08:31Z.
+    expect(instantFromLocalDateTime('2026-08-15T10:31', AMS)).toEqual(
+      new Date('2026-08-15T08:31:00Z'),
+    );
+    expect(instantFromLocalDateTime('2026-08-15T10:31', UTC)).toEqual(
+      new Date('2026-08-15T10:31:00Z'),
+    );
+  });
+
+  it('accepts an optional seconds component', () => {
+    expect(instantFromLocalDateTime('2026-08-15T10:31:45', UTC)).toEqual(
+      new Date('2026-08-15T10:31:45Z'),
+    );
+  });
+
+  it('handles a winter date on the other side of the DST switch', () => {
+    // Amsterdam is CET (UTC+1) in January.
+    expect(instantFromLocalDateTime('2026-01-15T10:31', AMS)).toEqual(
+      new Date('2026-01-15T09:31:00Z'),
+    );
+  });
+
+  it('round-trips back to the same wall-clock string', () => {
+    const typed = '2026-08-15T10:31';
+    expect(localDateTimeFromInstant(instantFromLocalDateTime(typed, AMS), AMS)).toBe(typed);
+  });
+
+  it('renders an instant as wall-clock time in the reporting zone', () => {
+    // The 22:40Z exit reads as 00:40 the next day in Amsterdam.
+    expect(localDateTimeFromInstant(new Date('2026-08-15T22:40:00Z'), AMS)).toBe(
+      '2026-08-16T00:40',
+    );
+    expect(localDateTimeFromInstant(new Date('2026-08-15T22:40:00Z'), UTC)).toBe(
+      '2026-08-15T22:40',
+    );
+  });
+
+  it('rejects a malformed value rather than yielding an Invalid Date', () => {
+    expect(() => instantFromLocalDateTime('15/08/2026 10:31', AMS)).toThrow(/YYYY-MM-DDTHH:mm/);
+    expect(() => instantFromLocalDateTime('', AMS)).toThrow();
   });
 });

@@ -31,4 +31,11 @@ export {
 export { sortExecutions } from './positions/ordering';
 export { reconstructPosition } from './positions/reconstruct';
 export { validateFields, validateSequence } from './positions/validate';
-export { groupByPeriod, localDayRange, periodKey, summarize } from './analytics/buckets';
+export {
+  groupByPeriod,
+  instantFromLocalDateTime,
+  localDateTimeFromInstant,
+  localDayRange,
+  periodKey,
+  summarize,
+} from './analytics/buckets';

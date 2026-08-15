@@ -71,7 +71,9 @@ export default async function OverviewPage() {
         />
         <MetricCard
           label="Win rate"
-          value={totals.winRate === null ? '—' : formatPercent(totals.winRate, 1).replace('+', '')}
+          value={
+            totals.winRate === null ? '—' : formatPercent(totals.winRate, 1, { signed: false })
+          }
           hint={`${totals.winners}W / ${totals.losers}L`}
         />
         <MetricCard
