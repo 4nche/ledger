@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { executionTypeSchema, marketTypeSchema, positionSideSchema } from './enums.js';
+import { executionTypeSchema, marketTypeSchema, positionSideSchema } from './enums';
 import {
   feeString,
   instant,
@@ -9,7 +9,7 @@ import {
   quantityString,
   text,
   uuidString,
-} from './primitives.js';
+} from './primitives';
 
 /**
  * Field shapes are declared *without* defaults, and defaults are added only on

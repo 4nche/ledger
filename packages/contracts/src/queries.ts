@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { positionSideSchema, positionStatusSchema } from './enums.js';
-import { calendarDate, timeZoneString, uuidString } from './primitives.js';
+import { positionSideSchema, positionStatusSchema } from './enums';
+import { calendarDate, timeZoneString, uuidString } from './primitives';
 
 /**
  * The product's default reporting timezone. Declared here so it is visible and

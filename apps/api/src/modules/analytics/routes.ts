@@ -1,6 +1,6 @@
 import { apiSuccess, overviewQuerySchema } from '@journal/contracts';
 import type { FastifyInstance } from 'fastify';
-import { buildOverview } from './service.js';
+import { buildOverview } from './service';
 
 export async function analyticsRoutes(app: FastifyInstance): Promise<void> {
   /**

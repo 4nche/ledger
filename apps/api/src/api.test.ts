@@ -3,8 +3,8 @@ import { accounts, positions, trades, users } from '@journal/db';
 import { eq, inArray } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { loadConfig } from './config.js';
-import { buildServer } from './server.js';
+import { loadConfig } from './config';
+import { buildServer } from './server';
 
 /**
  * Integration tests against a real PostgreSQL. They exist because the parts

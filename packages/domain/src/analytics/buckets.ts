@@ -1,6 +1,6 @@
 import { TZDate } from '@date-fns/tz';
-import { MONEY_SCALE, RATIO_SCALE, ZERO, parseDecimal, quantise } from '../money/decimal.js';
-import type { Period, PeriodGroup, PeriodSummary, RealizedEvent } from '../types.js';
+import { MONEY_SCALE, RATIO_SCALE, ZERO, parseDecimal, quantise } from '../money/decimal';
+import type { Period, PeriodGroup, PeriodSummary, RealizedEvent } from '../types';
 
 const DAY_MS = 86_400_000;
 

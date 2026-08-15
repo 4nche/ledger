@@ -12,11 +12,11 @@
     "dev": "turbo run dev",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
-    "lint": "turbo run lint",
+    "lint": "eslint .",
     "typecheck": "turbo run typecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "turbo run typecheck lint test",
+    "check": "pnpm lint && turbo run typecheck test lint",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:logs": "docker compose logs -f postgres",
@@ -24,9 +24,13 @@
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^22.15.0",
+    "eslint": "^9.39.5",
+    "globals": "^17.11.0",
     "prettier": "^3.4.2",
     "turbo": "^2.3.3",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.67.0"
   }
 }

@@ -1,0 +1,30 @@
+{
+  "extends": "@journal/config/tsconfig/next.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "allowJs": true,
+    "incremental": true,
+
+    /**
+     * Relaxed for the web app only. shadcn/ui components are vendored source we
+     * deliberately do not edit, and they pass `prop={value | undefined}` freely,
+     * which this flag rejects. It stays ON in domain, contracts, db and api,
+     * where the distinction between "absent" and "explicitly undefined" affects
+     * stored financial values.
+     */
+    "exactOptionalPropertyTypes": false,
+
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.mts",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": ["node_modules", ".next"]
+}

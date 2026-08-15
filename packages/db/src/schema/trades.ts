@@ -8,8 +8,8 @@ import {
   priceColumn,
   ratioColumn,
   timestampColumn,
-} from './columns.js';
-import { positions } from './positions.js';
+} from './columns';
+import { positions } from './positions';
 
 /**
  * One executed fill. These are the only raw facts the journal stores, and they

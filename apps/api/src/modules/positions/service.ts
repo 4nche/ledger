@@ -21,7 +21,7 @@ import {
   type PositionSnapshot,
 } from '@journal/domain';
 import { and, asc, eq, isNull } from 'drizzle-orm';
-import { notFound, unprocessable } from '../../errors.js';
+import { notFound, unprocessable } from '../../errors';
 
 /** The transaction handle Drizzle hands to `db.transaction`. */
 export type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];

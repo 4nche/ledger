@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { groupByPeriod, localDayRange, periodKey, summarize } from './buckets.js';
-import type { RealizedEvent } from '../types.js';
+import { groupByPeriod, localDayRange, periodKey, summarize } from './buckets';
+import type { RealizedEvent } from '../types';
 
 const AMS = 'Europe/Amsterdam';
 const UTC = 'UTC';

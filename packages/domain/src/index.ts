@@ -14,7 +14,7 @@ export type {
   ReconstructResult,
   ValidationCode,
   ValidationIssue,
-} from './types.js';
+} from './types';
 
 export {
   DECIMAL_PRECISION,
@@ -26,9 +26,9 @@ export {
   isDecimalString,
   parseDecimal,
   quantise,
-} from './money/decimal.js';
+} from './money/decimal';
 
-export { sortExecutions } from './positions/ordering.js';
-export { reconstructPosition } from './positions/reconstruct.js';
-export { validateFields, validateSequence } from './positions/validate.js';
-export { groupByPeriod, localDayRange, periodKey, summarize } from './analytics/buckets.js';
+export { sortExecutions } from './positions/ordering';
+export { reconstructPosition } from './positions/reconstruct';
+export { validateFields, validateSequence } from './positions/validate';
+export { groupByPeriod, localDayRange, periodKey, summarize } from './analytics/buckets';

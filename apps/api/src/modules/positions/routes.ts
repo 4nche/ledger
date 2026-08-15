@@ -10,8 +10,8 @@ import {
 } from '@journal/contracts';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { notFound } from '../../errors.js';
-import { findPositionDetail, listPositions } from './repository.js';
+import { notFound } from '../../errors';
+import { findPositionDetail, listPositions } from './repository';
 import {
   addTrade,
   createPosition,
@@ -19,7 +19,7 @@ import {
   softDeleteTrade,
   updatePosition,
   updateTrade,
-} from './service.js';
+} from './service';
 
 const idParams = z.object({ id: uuidString });
 

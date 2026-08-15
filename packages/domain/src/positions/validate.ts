@@ -1,5 +1,5 @@
-import { isDecimalString, parseDecimal, ZERO } from '../money/decimal.js';
-import type { ExecutionInput, PositionInput, ValidationIssue } from '../types.js';
+import { isDecimalString, parseDecimal, ZERO } from '../money/decimal';
+import type { ExecutionInput, PositionInput, ValidationIssue } from '../types';
 
 function issue(
   code: ValidationIssue['code'],

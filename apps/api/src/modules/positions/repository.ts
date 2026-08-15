@@ -8,7 +8,7 @@ import type {
 import { accounts, positions, trades, users, type Database } from '@journal/db';
 import { localDayRange } from '@journal/domain';
 import { and, asc, count, desc, eq, gte, isNull, lt, type SQL } from 'drizzle-orm';
-import { decimalOrNull, decimalOut } from '../../shared/decimal.js';
+import { decimalOrNull, decimalOut } from '../../shared/decimal';
 
 /**
  * Read models. Writes go through the service; nothing here mutates.

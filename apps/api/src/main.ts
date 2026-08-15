@@ -1,5 +1,5 @@
-import { loadConfig } from './config.js';
-import { buildServer } from './server.js';
+import { loadConfig } from './config';
+import { buildServer } from './server';
 
 /**
  * v1 has no authentication, so the server binds to loopback by default.

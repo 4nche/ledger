@@ -1,5 +1,5 @@
 import type { ExecutionInput, PositionSnapshot } from '@journal/domain';
-import type { NewPositionRow, NewTradeRow } from './schema/index.js';
+import type { NewPositionRow, NewTradeRow } from './schema/index';
 
 /**
  * Turns a domain snapshot into rows. Kept here so the API service, the seed

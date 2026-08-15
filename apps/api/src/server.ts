@@ -3,12 +3,12 @@ import cors from '@fastify/cors';
 import sensible from '@fastify/sensible';
 import Fastify, { type FastifyInstance } from 'fastify';
 import { sql } from 'drizzle-orm';
-import type { Config } from './config.js';
-import { databasePlugin } from './plugins/database.js';
-import { errorHandler } from './plugins/error-handler.js';
-import { accountRoutes } from './modules/accounts/routes.js';
-import { analyticsRoutes } from './modules/analytics/routes.js';
-import { positionRoutes } from './modules/positions/routes.js';
+import type { Config } from './config';
+import { databasePlugin } from './plugins/database';
+import { errorHandler } from './plugins/error-handler';
+import { accountRoutes } from './modules/accounts/routes';
+import { analyticsRoutes } from './modules/analytics/routes';
+import { positionRoutes } from './modules/positions/routes';
 
 export async function buildServer(config: Config): Promise<FastifyInstance> {
   const app = Fastify({

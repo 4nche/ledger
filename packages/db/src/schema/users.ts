@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { pgTable, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
-import { timestampColumn } from './columns.js';
-import { accounts } from './accounts.js';
+import { timestampColumn } from './columns';
+import { accounts } from './accounts';
 
 /**
  * Traders are modelled from day one even though v1 has no authentication, so

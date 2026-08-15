@@ -1,4 +1,4 @@
-import type { ExecutionInput } from '../types.js';
+import type { ExecutionInput } from '../types';
 
 /**
  * An entry stamped at the same instant as an exit is treated as happening

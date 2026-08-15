@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { reconstructPosition } from './reconstruct.js';
-import type { ExecutionInput, PositionInput, PositionSnapshot } from '../types.js';
+import { reconstructPosition } from './reconstruct';
+import type { ExecutionInput, PositionInput, PositionSnapshot } from '../types';
 
 let counter = 0;
 

@@ -1,11 +1,11 @@
-export { users, usersRelations } from './users.js';
-export type { NewUserRow, UserRow } from './users.js';
+export { users, usersRelations } from './users';
+export type { NewUserRow, UserRow } from './users';
 
-export { accounts, accountsRelations } from './accounts.js';
-export type { AccountRow, NewAccountRow } from './accounts.js';
+export { accounts, accountsRelations } from './accounts';
+export type { AccountRow, NewAccountRow } from './accounts';
 
-export { positions, positionsRelations } from './positions.js';
-export type { NewPositionRow, PositionRow } from './positions.js';
+export { positions, positionsRelations } from './positions';
+export type { NewPositionRow, PositionRow } from './positions';
 
-export { trades, tradesRelations } from './trades.js';
-export type { NewTradeRow, TradeRow } from './trades.js';
+export { trades, tradesRelations } from './trades';
+export type { NewTradeRow, TradeRow } from './trades';

@@ -8,9 +8,9 @@ import {
   priceColumn,
   ratioColumn,
   timestampColumn,
-} from './columns.js';
-import { accounts } from './accounts.js';
-import { trades } from './trades.js';
+} from './columns';
+import { accounts } from './accounts';
+import { trades } from './trades';
 
 /**
  * A position is the whole trading idea. Everything below `initial_stop_price`

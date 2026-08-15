@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { createAccountSchema, updateAccountSchema } from './accounts.js';
-import { overviewQuerySchema } from './analytics.js';
+import { createAccountSchema, updateAccountSchema } from './accounts';
+import { overviewQuerySchema } from './analytics';
 import {
   createPositionSchema,
   tradeInputSchema,
   updatePositionSchema,
   updateTradeSchema,
-} from './positions.js';
-import { feeString, instant, priceString, quantityString, timeZoneString } from './primitives.js';
-import { listPositionsQuerySchema } from './queries.js';
-import { apiFailure, apiSuccess, paginationMeta } from './response.js';
+} from './positions';
+import { feeString, instant, priceString, quantityString, timeZoneString } from './primitives';
+import { listPositionsQuerySchema } from './queries';
+import { apiFailure, apiSuccess, paginationMeta } from './response';
 
 const UUID = '3f8c2b1e-9d4a-4c7b-8e21-5a6f0d7b9c34';
 

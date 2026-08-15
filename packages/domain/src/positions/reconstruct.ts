@@ -7,16 +7,16 @@ import {
   parseDecimal,
   quantise,
   type DecimalValue,
-} from '../money/decimal.js';
-import { sortExecutions } from './ordering.js';
-import { validateFields, validateSequence } from './validate.js';
+} from '../money/decimal';
+import { sortExecutions } from './ordering';
+import { validateFields, validateSequence } from './validate';
 import type {
   ExecutionInput,
   PositionInput,
   PositionSnapshot,
   ReconstructResult,
   RealizedExecution,
-} from '../types.js';
+} from '../types';
 
 /**
  * Derives every stored value of a position from its raw executions.

@@ -1,9 +1,9 @@
 import { relations, sql } from 'drizzle-orm';
 import { boolean, check, index, pgTable, uuid, varchar } from 'drizzle-orm/pg-core';
 import { ACCOUNT_TYPES, PROVIDERS } from '@journal/contracts';
-import { moneyColumn, oneOf, timestampColumn } from './columns.js';
-import { users } from './users.js';
-import { positions } from './positions.js';
+import { moneyColumn, oneOf, timestampColumn } from './columns';
+import { users } from './users';
+import { positions } from './positions';
 
 /**
  * An account belongs to exactly one trader, which is why positions carry no

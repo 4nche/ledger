@@ -2,7 +2,7 @@ import { apiFailure, type ApiIssue } from '@journal/contracts';
 import type { FastifyInstance } from 'fastify';
 import fp from 'fastify-plugin';
 import { ZodError } from 'zod';
-import { HttpError } from '../errors.js';
+import { HttpError } from '../errors';
 
 /** Fastify types the handler's error as `unknown`, so narrow it deliberately. */
 function statusCodeOf(error: unknown): number {

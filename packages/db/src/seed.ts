@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { reconstructPosition, type ExecutionInput, type PositionSide } from '@journal/domain';
-import { createDatabase, readConnectionString } from './client.js';
-import { toPositionRow, toTradeRows } from './mappers.js';
-import { accounts, positions, trades, users } from './schema/index.js';
+import { createDatabase, readConnectionString } from './client';
+import { toPositionRow, toTradeRows } from './mappers';
+import { accounts, positions, trades, users } from './schema/index';
 
 /**
  * Development seed. Derived values are produced by the domain package rather

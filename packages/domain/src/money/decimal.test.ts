@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatDecimal, isDecimalString, parseDecimal } from './decimal.js';
+import { formatDecimal, isDecimalString, parseDecimal } from './decimal';
 
 describe('isDecimalString', () => {
   it.each(['0', '1', '-1', '117500', '0.125', '-0.125', '117523.40'])('accepts %s', (value) => {

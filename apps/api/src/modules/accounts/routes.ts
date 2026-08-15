@@ -11,8 +11,8 @@ import { accounts, users } from '@journal/db';
 import { and, asc, eq, isNull } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { notFound } from '../../errors.js';
-import { decimalOut } from '../../shared/decimal.js';
+import { notFound } from '../../errors';
+import { decimalOut } from '../../shared/decimal';
 
 const idParams = z.object({ id: uuidString });
 

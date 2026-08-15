@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { accountTypeSchema, providerSchema } from './enums.js';
-import { balanceString, nullableText, optionalText, text, uuidString } from './primitives.js';
+import { accountTypeSchema, providerSchema } from './enums';
+import { balanceString, nullableText, optionalText, text, uuidString } from './primitives';
 
 /**
  * `currentBalance` is deliberately absent in v1. A hand-maintained balance

@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { periodSchema } from './enums.js';
-import { positionFiltersSchema } from './queries.js';
+import { periodSchema } from './enums';
+import { positionFiltersSchema } from './queries';
 
 /**
  * The overview returns the *whole* filtered range, grouped and summarised

@@ -16,8 +16,8 @@ import {
   type RealizedEvent,
 } from '@journal/domain';
 import { and, desc, eq, gte, isNull, lt } from 'drizzle-orm';
-import { decimalOrNull, decimalOut } from '../../shared/decimal.js';
-import { filterConditions } from '../positions/repository.js';
+import { decimalOrNull, decimalOut } from '../../shared/decimal';
+import { filterConditions } from '../positions/repository';
 
 /**
  * A realized event carries everything the row needs plus the shape the domain

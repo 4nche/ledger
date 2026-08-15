@@ -10,7 +10,7 @@ export {
   text,
   timeZoneString,
   uuidString,
-} from './primitives.js';
+} from './primitives';
 
 export {
   ACCOUNT_TYPES,
@@ -27,17 +27,17 @@ export {
   positionSideSchema,
   positionStatusSchema,
   providerSchema,
-} from './enums.js';
-export type { AccountType, Provider } from './enums.js';
+} from './enums';
+export type { AccountType, Provider } from './enums';
 
-export { createAccountSchema, createUserSchema, updateAccountSchema } from './accounts.js';
+export { createAccountSchema, createUserSchema, updateAccountSchema } from './accounts';
 export type {
   AccountResponse,
   CreateAccountInput,
   CreateUserInput,
   UpdateAccountInput,
   UserResponse,
-} from './accounts.js';
+} from './accounts';
 
 export {
   addTradeSchema,
@@ -45,7 +45,7 @@ export {
   tradeInputSchema,
   updatePositionSchema,
   updateTradeSchema,
-} from './positions.js';
+} from './positions';
 export type {
   CreatePositionInput,
   PositionDetailResponse,
@@ -54,24 +54,24 @@ export type {
   TradeResponse,
   UpdatePositionInput,
   UpdateTradeInput,
-} from './positions.js';
+} from './positions';
 
 export {
   DEFAULT_REPORTING_TIME_ZONE,
   listPositionsQuerySchema,
   paginationSchema,
   positionFiltersSchema,
-} from './queries.js';
-export type { ListPositionsQuery, PositionFilters } from './queries.js';
+} from './queries';
+export type { ListPositionsQuery, PositionFilters } from './queries';
 
-export { overviewQuerySchema } from './analytics.js';
+export { overviewQuerySchema } from './analytics';
 export type {
   OverviewQuery,
   OverviewResponse,
   PeriodGroupResponse,
   PeriodSummaryResponse,
   RealizedEventResponse,
-} from './analytics.js';
+} from './analytics';
 
-export { apiFailure, apiSuccess, paginationMeta } from './response.js';
-export type { ApiFailure, ApiIssue, ApiResponse, ApiSuccess, PaginationMeta } from './response.js';
+export { apiFailure, apiSuccess, paginationMeta } from './response';
+export type { ApiFailure, ApiIssue, ApiResponse, ApiSuccess, PaginationMeta } from './response';
