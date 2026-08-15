@@ -15,9 +15,16 @@ SQL query.
 - PostgreSQL stores decimals as `numeric`. Never `float8`, never `real`.
 - The API transports decimals as **JSON strings** (`"117523.40"`), never JSON numbers.
 - Backend arithmetic uses `decimal.js` configured at **40 significant digits**.
-- No intermediate rounding. Values are rounded only at the display layer.
-- Division (weighted averages, percentages, R) is the only operation where precision is
-  observable; 40 digits is far beyond the 12 decimal places we persist.
+- **Intermediate** arithmetic is never rounded. Division (weighted averages, percentages, R)
+  is the only operation where precision is observable, and 40 digits is far beyond the 12
+  decimal places we persist.
+- **Outputs** are quantised, half-up, to the scale they are persisted at. The domain layer
+  therefore emits exactly the values the database stores, which is what makes
+  `recalculatePosition` verifiable: recomputing must reproduce the stored row byte for byte.
+- Where a total has parts, the total is the **sum of the quantised parts**, not the quantised
+  sum. A position's realized PnL is the sum of its already-rounded per-exit slices, so the
+  parts always add up to the whole as displayed. Without this, a scaled position's rows
+  visibly fail to sum to its total.
 
 Persisted scales:
 
@@ -117,7 +124,7 @@ These per-exit values are persisted on the `trades` row (`realized_pnl`, `realiz
 ### 6.2 Position rollup
 
 ```
-positions.realized_pnl = Σ realizedPnl(x) for all EXIT trades x
+positions.realized_pnl = Σ realizedPnl(x) for all EXIT trades x   (already quantised, per §1)
 positions.fees         = Σ fee for all trades (entries and exits)
 ```
 
