@@ -11,7 +11,7 @@ import {
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { notFound } from '../../errors';
-import { findPositionDetail, listPositions } from './repository';
+import { findPositionDetail, listPositions, listSymbols } from './repository';
 import {
   addTrade,
   createPosition,
@@ -31,6 +31,9 @@ async function requireDetail(app: FastifyInstance, positionId: string) {
 }
 
 export async function positionRoutes(app: FastifyInstance): Promise<void> {
+  /** Distinct symbols ever traded, for the overview's symbol filter. */
+  app.get('/symbols', async () => apiSuccess(await listSymbols(app.db)));
+
   app.get('/positions', async (request) => {
     const query = listPositionsQuerySchema.parse(request.query);
     const { items, total } = await listPositions(app.db, query);

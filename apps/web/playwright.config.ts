@@ -1,9 +1,16 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * End-to-end tests against a running stack. They assume the API and PostgreSQL
- * are already up — `pnpm db:up` then the dev servers — because the point is to
- * exercise the real thing, not a mocked one.
+ * End-to-end tests against a running stack: PostgreSQL, the API, and a
+ * production build of the web app.
+ *
+ *   pnpm db:up
+ *   pnpm --filter @journal/api dev
+ *   pnpm --filter @journal/web build && pnpm --filter @journal/web start
+ *
+ * Deliberately not the dev server. Turbopack's HMR client and on-demand chunks
+ * make hydration timing unpredictable under automation, and a test that fails
+ * because a chunk was slow teaches nothing about the application.
  */
 export default defineConfig({
   testDir: './e2e',

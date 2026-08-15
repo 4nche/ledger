@@ -191,3 +191,14 @@ export async function findPositionDetail(
     trades: executions.map(serializeTrade),
   };
 }
+
+/** Distinct symbols across non-deleted positions, alphabetical. */
+export async function listSymbols(db: Database): Promise<string[]> {
+  const rows = await db
+    .selectDistinct({ symbol: positions.symbol })
+    .from(positions)
+    .where(isNull(positions.deletedAt))
+    .orderBy(asc(positions.symbol));
+
+  return rows.map((row) => row.symbol);
+}
