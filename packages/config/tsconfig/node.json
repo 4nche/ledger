@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Node service (Fastify API, scripts, workers)",
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["node"],
+    "outDir": "dist",
+    "rootDir": "src"
+  }
+}

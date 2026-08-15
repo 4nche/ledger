@@ -1,0 +1,32 @@
+{
+  "name": "trading-journal",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22.15.0",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "turbo run typecheck lint test",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f postgres",
+    "db:nuke": "docker compose down -v",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "prettier": "^3.4.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
+  }
+}
