@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { groupByPeriod, periodKey, summarize } from './buckets.js';
+import { groupByPeriod, localDayRange, periodKey, summarize } from './buckets.js';
 import type { RealizedEvent } from '../types.js';
 
 const AMS = 'Europe/Amsterdam';
@@ -207,5 +207,35 @@ describe('summarize', () => {
     expect(summary.winRate).toBeNull();
     expect(summary.totalR).toBeNull();
     expect(summary.averageR).toBeNull();
+  });
+});
+
+describe('localDayRange — turning date filters into instants', () => {
+  it('spans from the start of `from` to the start of the day after `to`', () => {
+    const range = localDayRange('2026-08-10', '2026-08-15', AMS);
+    expect(range.gte).toEqual(new Date('2026-08-09T22:00:00Z')); // 10 Aug 00:00 local
+    expect(range.lt).toEqual(new Date('2026-08-15T22:00:00Z')); // 16 Aug 00:00 local
+  });
+
+  it('includes the whole of the `to` day, not just its first instant', () => {
+    const range = localDayRange('2026-08-15', '2026-08-15', AMS);
+    const lateOnThe15th = new Date('2026-08-15T21:59:00Z'); // 23:59 local
+    expect(range.gte!.getTime()).toBeLessThanOrEqual(lateOnThe15th.getTime());
+    expect(range.lt!.getTime()).toBeGreaterThan(lateOnThe15th.getTime());
+  });
+
+  it('shifts with the reporting timezone', () => {
+    expect(localDayRange('2026-08-10', null, 'UTC').gte).toEqual(new Date('2026-08-10T00:00:00Z'));
+    expect(localDayRange('2026-08-10', null, AMS).gte).toEqual(new Date('2026-08-09T22:00:00Z'));
+  });
+
+  it('leaves an open end unbounded', () => {
+    expect(localDayRange(null, null, AMS)).toEqual({ gte: null, lt: null });
+    expect(localDayRange('2026-08-10', null, AMS).lt).toBeNull();
+    expect(localDayRange(null, '2026-08-10', AMS).gte).toBeNull();
+  });
+
+  it('rejects a malformed date rather than producing an Invalid Date', () => {
+    expect(() => localDayRange('15-08-2026', null, AMS)).toThrow(/YYYY-MM-DD/);
   });
 });

@@ -3,6 +3,7 @@ export {
   calendarDate,
   feeString,
   instant,
+  nullableText,
   optionalText,
   priceString,
   quantityString,
@@ -52,6 +53,7 @@ export type {
   TradeInput,
   TradeResponse,
   UpdatePositionInput,
+  UpdateTradeInput,
 } from './positions.js';
 
 export {

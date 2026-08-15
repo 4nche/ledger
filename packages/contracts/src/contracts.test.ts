@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { createAccountSchema } from './accounts.js';
+import { createAccountSchema, updateAccountSchema } from './accounts.js';
 import { overviewQuerySchema } from './analytics.js';
-import { createPositionSchema, tradeInputSchema } from './positions.js';
+import {
+  createPositionSchema,
+  tradeInputSchema,
+  updatePositionSchema,
+  updateTradeSchema,
+} from './positions.js';
 import { feeString, instant, priceString, quantityString, timeZoneString } from './primitives.js';
 import { listPositionsQuerySchema } from './queries.js';
 import { apiFailure, apiSuccess, paginationMeta } from './response.js';
@@ -255,5 +260,49 @@ describe('response envelope', () => {
     ]);
     expect(response.success).toBe(false);
     expect(response.issues?.[0]?.path).toBe('trades.0.price');
+  });
+});
+
+describe('patch schemas do not resurrect create-time defaults', () => {
+  // Regression: Zod's .partial() does NOT strip .default(), so deriving a patch
+  // schema from a defaulted create schema made a one-field PATCH silently reset
+  // every other defaulted field. A fee reset to "0" changes realized PnL.
+  it('leaves an unmentioned trade fee alone', () => {
+    const patch = updateTradeSchema.parse({ quantity: '0.04' });
+    expect(patch).toEqual({ quantity: '0.04' });
+    expect(patch.fee).toBeUndefined();
+    expect(patch.notes).toBeUndefined();
+    expect(patch.externalTradeId).toBeUndefined();
+  });
+
+  it('leaves unmentioned position fields alone', () => {
+    const patch = updatePositionSchema.parse({ symbol: 'ethusdt' });
+    expect(patch).toEqual({ symbol: 'ETHUSDT' });
+    expect(patch.marketType).toBeUndefined();
+    expect(patch.initialStopPrice).toBeUndefined();
+    expect(patch.notes).toBeUndefined();
+  });
+
+  it('leaves unmentioned account fields alone', () => {
+    const patch = updateAccountSchema.parse({ name: 'Renamed' });
+    expect(patch).toEqual({ name: 'Renamed' });
+    expect(patch.isActive).toBeUndefined();
+    expect(patch.externalAccountId).toBeUndefined();
+  });
+
+  it('still applies defaults on the create schemas', () => {
+    const trade = tradeInputSchema.parse({
+      type: 'EXIT',
+      price: '1',
+      quantity: '1',
+      executedAt: '2026-08-15T10:00:00Z',
+    });
+    expect(trade.fee).toBe('0');
+    expect(trade.notes).toBeNull();
+  });
+
+  it('distinguishes "set to null" from "not mentioned"', () => {
+    expect(updateTradeSchema.parse({ notes: '  ' }).notes).toBeNull();
+    expect('notes' in updateTradeSchema.parse({ quantity: '1' })).toBe(false);
   });
 });

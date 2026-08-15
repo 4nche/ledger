@@ -108,6 +108,35 @@ export function periodKey(instant: Date, period: Period, timeZone: string): stri
   }
 }
 
+const CALENDAR_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+function parseCalendarDate(value: string): LocalDate {
+  const match = CALENDAR_DATE_PATTERN.exec(value);
+  if (match === null) {
+    throw new TypeError(`Expected a date in YYYY-MM-DD form, got ${JSON.stringify(value)}.`);
+  }
+  return { year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) };
+}
+
+/**
+ * Converts inclusive calendar-date filters into a half-open instant range
+ * `[gte, lt)` in the reporting timezone.
+ *
+ * The end is the start of the day *after* `to`, so the whole of the `to` day is
+ * included. Comparing against `to`'s own midnight would silently drop every
+ * trade after 00:00 on the last day a trader asked for.
+ */
+export function localDayRange(
+  from: string | null,
+  to: string | null,
+  timeZone: string,
+): { gte: Date | null; lt: Date | null } {
+  return {
+    gte: from === null ? null : startOfLocalDay(parseCalendarDate(from), timeZone),
+    lt: to === null ? null : startOfLocalDay(addDays(parseCalendarDate(to), 1), timeZone),
+  };
+}
+
 /**
  * Splits realized events into one group per period, newest group first, with
  * items inside each group newest first. The input array is not mutated.

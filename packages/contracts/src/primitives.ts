@@ -88,13 +88,20 @@ export function text(label: string, max: number) {
     .max(max, { error: `${label} must be ${max} characters or fewer.` });
 }
 
-/** Optional free text that normalises blank input to null rather than "". */
-export function optionalText(max: number) {
+/**
+ * Nullable free text that normalises blank input to null rather than "".
+ * Carries no default, so it is safe to build a patch schema from.
+ */
+export function nullableText(max: number) {
   return z
     .string()
     .trim()
     .max(max)
     .transform((value) => (value.length === 0 ? null : value))
-    .nullable()
-    .default(null);
+    .nullable();
+}
+
+/** As `nullableText`, but absent means null. For create schemas only. */
+export function optionalText(max: number) {
+  return nullableText(max).default(null);
 }

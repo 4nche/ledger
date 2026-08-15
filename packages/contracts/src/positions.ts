@@ -3,6 +3,7 @@ import { executionTypeSchema, marketTypeSchema, positionSideSchema } from './enu
 import {
   feeString,
   instant,
+  nullableText,
   optionalText,
   priceString,
   quantityString,
@@ -10,18 +11,43 @@ import {
   uuidString,
 } from './primitives.js';
 
-/** One executed fill submitted with a position. */
-export const tradeInputSchema = z.object({
+/**
+ * Field shapes are declared *without* defaults, and defaults are added only on
+ * the create schemas.
+ *
+ * This matters: Zod's `.partial()` does not strip a `.default()`, so deriving a
+ * patch schema from a defaulted create schema silently reapplies every default
+ * to fields the caller never mentioned — a PATCH changing one field would reset
+ * the rest. Building patch schemas from the undefaulted fields avoids it.
+ */
+const tradeFields = {
   type: executionTypeSchema,
   price: priceString,
   quantity: quantityString,
-  fee: feeString.default('0'),
+  fee: feeString,
   executedAt: instant,
+  externalTradeId: nullableText(200),
+  notes: nullableText(2000),
+};
+
+/** One executed fill submitted with a position. */
+export const tradeInputSchema = z.object({
+  ...tradeFields,
+  fee: feeString.default('0'),
   externalTradeId: optionalText(200),
   notes: optionalText(2000),
 });
 
 const symbolSchema = text('Symbol', 40).toUpperCase();
+
+const positionFields = {
+  symbol: symbolSchema,
+  marketType: marketTypeSchema,
+  side: positionSideSchema,
+  initialStopPrice: priceString.nullable(),
+  notes: nullableText(5000),
+  trades: z.array(tradeInputSchema).min(1, { error: 'A position needs at least one execution.' }),
+};
 
 /**
  * The client submits raw executions only. Every derived value — averages,
@@ -30,25 +56,26 @@ const symbolSchema = text('Symbol', 40).toUpperCase();
  */
 export const createPositionSchema = z.object({
   accountId: uuidString,
-  symbol: symbolSchema,
+  ...positionFields,
   marketType: marketTypeSchema.default('PERPETUAL'),
-  side: positionSideSchema,
   initialStopPrice: priceString.nullable().default(null),
   notes: optionalText(5000),
-  trades: z.array(tradeInputSchema).min(1, { error: 'A position needs at least one execution.' }),
 });
 
 /**
- * Editing replaces the full execution set, so the position is always rebuilt
- * from a complete picture rather than patched incrementally.
+ * Supplying `trades` replaces the whole execution set, so the position is
+ * always rebuilt from a complete picture rather than patched incrementally.
+ * Omitting a field leaves it untouched.
  */
-export const updatePositionSchema = createPositionSchema.omit({ accountId: true }).partial();
+export const updatePositionSchema = z.object(positionFields).partial();
 
 export const addTradeSchema = tradeInputSchema;
 
-export const updateTradeSchema = tradeInputSchema.partial();
+/** Omitted fields keep their stored value — no default is reapplied. */
+export const updateTradeSchema = z.object(tradeFields).partial();
 
 export type TradeInput = z.infer<typeof tradeInputSchema>;
+export type UpdateTradeInput = z.infer<typeof updateTradeSchema>;
 export type CreatePositionInput = z.infer<typeof createPositionSchema>;
 export type UpdatePositionInput = z.infer<typeof updatePositionSchema>;
 

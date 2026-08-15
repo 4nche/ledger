@@ -66,6 +66,9 @@ export function toTradeRows(
       quantity: execution.quantity,
       fee: execution.fee,
       executedAt: execution.executedAt,
+      // Persist the exact createdAt the ordering tie-break used, so a later
+      // recalculation sorts same-instant executions identically. Rules §4.
+      createdAt: execution.createdAt,
       realizedPnl: realized?.realizedPnl ?? null,
       realizedPnlPct: realized?.realizedPnlPct ?? null,
       rMultiple: realized?.rMultiple ?? null,

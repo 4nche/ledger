@@ -31,4 +31,4 @@ export {
 export { sortExecutions } from './positions/ordering.js';
 export { reconstructPosition } from './positions/reconstruct.js';
 export { validateFields, validateSequence } from './positions/validate.js';
-export { groupByPeriod, periodKey, summarize } from './analytics/buckets.js';
+export { groupByPeriod, localDayRange, periodKey, summarize } from './analytics/buckets.js';
