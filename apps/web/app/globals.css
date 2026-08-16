@@ -60,14 +60,14 @@
      appears as a FILL, and --profit is the only green that appears as TEXT.
      Green text is always money; a green fill is never money. */
 
-  --canvas: #f1f0ec; /* warm grey page, deliberately not cream */
+  --canvas: #f9f9f9; /* neutral off-white page */
   --surface: #ffffff; /* panels sit on the canvas */
-  --ink: #1a1917; /* warm near-black */
-  --ink-muted: #6e6b66;
-  --hairline: #e4e1da; /* the only separator in the design */
+  --ink: #1a1a1a;
+  --ink-muted: #6b6b6b;
+  --hairline: #e7e7e7; /* the only separator in the design */
 
   --profit: #12a150; /* text only */
-  --loss: #c0442c; /* text only — warm brick, tuned to the canvas */
+  --loss: #c8402a; /* text only */
 
   /* --- shadcn semantic tokens ---------------------------------------------- */
   --background: var(--canvas);
@@ -79,11 +79,11 @@
 
   --primary: #0f7b4f; /* fills only: buttons, selected chips */
   --primary-foreground: #ffffff;
-  --secondary: #e9e7e1;
+  --secondary: #efefef;
   --secondary-foreground: var(--ink);
-  --muted: #e9e7e1;
+  --muted: #efefef;
   --muted-foreground: var(--ink-muted);
-  --accent: #e6e4dd; /* shadcn's hover surface, not a brand colour */
+  --accent: #ececec; /* shadcn's hover surface, not a brand colour */
   --accent-foreground: var(--ink);
   --destructive: var(--loss);
 
@@ -92,10 +92,10 @@
   --ring: #0f7b4f;
 
   --chart-1: #0f7b4f;
-  --chart-2: #c0442c;
-  --chart-3: #6e6b66;
-  --chart-4: #a89f8c;
-  --chart-5: #1a1917;
+  --chart-2: #c8402a;
+  --chart-3: #6b6b6b;
+  --chart-4: #a0a0a0;
+  --chart-5: #1a1a1a;
 
   --radius: 0.75rem;
 
@@ -103,20 +103,20 @@
   --sidebar-foreground: var(--ink);
   --sidebar-primary: #0f7b4f;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e6e4dd;
+  --sidebar-accent: #ececec;
   --sidebar-accent-foreground: var(--ink);
   --sidebar-border: var(--hairline);
   --sidebar-ring: #0f7b4f;
 }
 
 .dark {
-  /* Warm near-blacks rather than blue-greys, so the palette keeps the same
-     temperature as the light theme instead of becoming a different product. */
-  --canvas: #141311;
-  --surface: #1c1b19;
-  --ink: #edebe7;
-  --ink-muted: #9a968f;
-  --hairline: #2c2a27;
+  /* Neutral near-blacks, matching the light theme's temperature so the two
+     read as one product rather than two. */
+  --canvas: #121212;
+  --surface: #1a1a1a;
+  --ink: #ebebeb;
+  --ink-muted: #969696;
+  --hairline: #2a2a2a;
 
   --profit: #2ecc71;
   --loss: #e86c52;
@@ -129,12 +129,12 @@
   --popover-foreground: var(--ink);
 
   --primary: #18a05f;
-  --primary-foreground: #0b0f0c;
-  --secondary: #262421;
+  --primary-foreground: #0d0d0d;
+  --secondary: #242424;
   --secondary-foreground: var(--ink);
-  --muted: #262421;
+  --muted: #242424;
   --muted-foreground: var(--ink-muted);
-  --accent: #2c2a27;
+  --accent: #2a2a2a;
   --accent-foreground: var(--ink);
   --destructive: var(--loss);
 
@@ -144,15 +144,15 @@
 
   --chart-1: #18a05f;
   --chart-2: #e86c52;
-  --chart-3: #9a968f;
-  --chart-4: #6e6b66;
-  --chart-5: #edebe7;
+  --chart-3: #969696;
+  --chart-4: #6b6b6b;
+  --chart-5: #ebebeb;
 
   --sidebar: var(--surface);
   --sidebar-foreground: var(--ink);
   --sidebar-primary: #18a05f;
-  --sidebar-primary-foreground: #0b0f0c;
-  --sidebar-accent: #2c2a27;
+  --sidebar-primary-foreground: #0d0d0d;
+  --sidebar-accent: #2a2a2a;
   --sidebar-accent-foreground: var(--ink);
   --sidebar-border: var(--hairline);
   --sidebar-ring: #18a05f;
@@ -199,12 +199,5 @@
   .figure {
     @apply font-mono tabular-nums;
     font-feature-settings: 'tnum' 1;
-  }
-
-  /* Units, currency symbols and R suffixes are held back so the magnitude
-     reads first. Borrowed from the reference and the single biggest reason
-     its dense number columns stay calm. */
-  .unit {
-    @apply opacity-45;
   }
 }

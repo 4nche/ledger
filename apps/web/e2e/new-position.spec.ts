@@ -7,7 +7,10 @@ import { expect, test, type Page } from '@playwright/test';
  */
 
 const SPEC_EXAMPLE = {
-  symbol: 'BTCUSDT',
+  // Every symbol these tests create starts with E2E so global teardown can
+  // find and remove them. A realistic symbol would be indistinguishable from
+  // seeded data and would quietly accumulate in the journal.
+  symbol: 'E2ESPEC',
   openedAt: '2026-08-15T10:31',
   entryPrice: '117500',
   quantity: '0.1',

@@ -24,7 +24,7 @@ export default async function EditPositionPage({ params }: { params: Promise<{ i
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight">
+        <h1 className="text-xl font-medium tracking-tight">
           Edit <span className="font-mono">{position.symbol}</span>
         </h1>
         <p className="text-muted-foreground mt-0.5 text-sm">

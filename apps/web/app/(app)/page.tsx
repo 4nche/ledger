@@ -38,7 +38,7 @@ export default async function OverviewPage() {
   if (overview === null) {
     return (
       <div className="space-y-6">
-        <h1 className="text-xl font-semibold tracking-tight">Overview</h1>
+        <h1 className="text-xl font-medium tracking-tight">Overview</h1>
         <Unreachable message={failure ?? 'The API returned no data.'} />
       </div>
     );
@@ -49,7 +49,7 @@ export default async function OverviewPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-baseline justify-between gap-4">
-        <h1 className="text-xl font-semibold tracking-tight">Overview</h1>
+        <h1 className="text-xl font-medium tracking-tight">Overview</h1>
         <p className="text-muted-foreground text-xs">All accounts · reporting in {timeZone}</p>
       </div>
 

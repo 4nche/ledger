@@ -41,7 +41,7 @@ export default async function TradesPage({
     <div className="space-y-5">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Trades</h1>
+          <h1 className="text-xl font-medium tracking-tight">Trades</h1>
           <p className="text-muted-foreground mt-0.5 text-sm">
             One table per period. A row is PnL realized by an exit, so a scaled position appears in
             each period it earned in.

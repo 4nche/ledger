@@ -11,7 +11,7 @@ export default async function NewPositionPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight">New Position</h1>
+        <h1 className="text-xl font-medium tracking-tight">New Position</h1>
         <p className="text-muted-foreground mt-0.5 text-sm">
           Times are recorded in {context.reportingTimeZone}. Everything else is derived by the
           server.

@@ -22,7 +22,7 @@ export function AppShell({ children, trader }: { children: ReactNode; trader: Tr
     <div className="flex min-h-full flex-col">
       <header className="border-border/60 bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky top-0 z-40 border-b backdrop-blur">
         <div className="mx-auto flex h-14 w-full max-w-[1600px] items-center gap-6 px-4">
-          <Link href="/" className="text-sm font-semibold tracking-tight">
+          <Link href="/" className="text-sm font-medium tracking-tight">
             Trading Journal
           </Link>
 

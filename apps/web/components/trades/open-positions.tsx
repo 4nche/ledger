@@ -31,7 +31,7 @@ export function OpenPositions({
   return (
     <section className="space-y-2">
       <header className="flex items-baseline gap-3">
-        <h2 className="text-sm font-semibold tracking-wide">OPEN POSITIONS</h2>
+        <h2 className="text-sm font-medium tracking-wide">OPEN POSITIONS</h2>
         <span className="text-muted-foreground text-xs">
           Still on risk — excluded from the realized totals above
         </span>

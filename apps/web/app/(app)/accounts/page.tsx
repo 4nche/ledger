@@ -42,7 +42,7 @@ export default async function AccountsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Accounts</h1>
+          <h1 className="text-xl font-medium tracking-tight">Accounts</h1>
           <p className="text-muted-foreground mt-0.5 text-sm">
             Each account belongs to one trader. Positions inherit their trader from the account.
           </p>

@@ -56,7 +56,7 @@ export default async function PositionDetailPage({ params }: { params: Promise<{
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <h1 className="font-mono text-xl font-semibold tracking-tight">{position.symbol}</h1>
+            <h1 className="font-mono text-xl font-medium tracking-tight">{position.symbol}</h1>
             <Badge variant={position.side === 'LONG' ? 'secondary' : 'outline'}>
               {position.side}
             </Badge>

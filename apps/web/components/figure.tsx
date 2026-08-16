@@ -3,10 +3,8 @@ import { cn } from '@/lib/utils';
 /**
  * Every number in the journal is rendered through here.
  *
- * The unit — a currency symbol, a percent sign, the R suffix — is held back to
- * 45% opacity so the magnitude reads first. It is the single detail that lets
- * dense number columns stay calm, and doing it in one place is what keeps it
- * consistent across every table.
+ * Centralising them keeps signs, decimal places and units identical in every
+ * table, which is what lets a column of figures be compared by eye.
  *
  * Colour is applied only when the number *is* a gain or a loss. A quantity or
  * a price is never green or red, because it is neither.
@@ -58,7 +56,7 @@ export function Money({
   return (
     <Figure className={cn(tone && toneOf(value), className)}>
       {sign}
-      <span className="unit">{symbol}</span>
+      {symbol}
       {digits}
     </Figure>
   );
@@ -86,8 +84,7 @@ export function Percent({
   return (
     <Figure className={cn(tone && toneOf(value), className)}>
       {sign}
-      {Math.abs(percent).toFixed(fractionDigits)}
-      <span className="unit">%</span>
+      {Math.abs(percent).toFixed(fractionDigits)}%
     </Figure>
   );
 }
@@ -115,8 +112,7 @@ export function RMultiple({
   return (
     <Figure className={cn(tone && toneOf(value), className)}>
       {sign}
-      {Math.abs(r).toFixed(2)}
-      <span className="unit">R</span>
+      {Math.abs(r).toFixed(2)}R
     </Figure>
   );
 }
