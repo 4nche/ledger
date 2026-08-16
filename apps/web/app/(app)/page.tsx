@@ -17,7 +17,7 @@ function Unreachable({ message }: { message: string }) {
       <CardContent className="flex items-start gap-3 py-2">
         <AlertTriangle className="text-destructive mt-0.5 size-4 shrink-0" />
         <div className="space-y-1">
-          <p className="text-sm font-medium">Could not load performance</p>
+          <p className="text-sm">Could not load performance</p>
           <p className="text-muted-foreground text-sm">{message}</p>
         </div>
       </CardContent>
@@ -38,7 +38,7 @@ export default async function OverviewPage() {
   if (overview === null) {
     return (
       <div className="space-y-6">
-        <h1 className="text-xl font-medium tracking-tight">Overview</h1>
+        <h1 className="text-xl tracking-tight">Overview</h1>
         <Unreachable message={failure ?? 'The API returned no data.'} />
       </div>
     );
@@ -49,7 +49,7 @@ export default async function OverviewPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-baseline justify-between gap-4">
-        <h1 className="text-xl font-medium tracking-tight">Overview</h1>
+        <h1 className="text-xl tracking-tight">Overview</h1>
         <p className="text-muted-foreground text-xs">All accounts · reporting in {timeZone}</p>
       </div>
 
@@ -90,12 +90,12 @@ export default async function OverviewPage() {
       </div>
 
       <section className="space-y-3">
-        <h2 className="text-sm font-medium">Recent days</h2>
+        <h2 className="text-sm">Recent days</h2>
 
         {groups.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center">
-              <p className="text-sm font-medium">Nothing realized yet</p>
+              <p className="text-sm">Nothing realized yet</p>
               <p className="text-muted-foreground mt-1 text-sm">
                 Record a position to start building history.
               </p>

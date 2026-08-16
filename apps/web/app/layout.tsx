@@ -6,19 +6,19 @@ import { Providers } from './providers';
 import './globals.css';
 import { cn } from '@/lib/utils';
 
-// Only regular and medium are loaded, so no bold weight exists to be applied
-// anywhere in the application. Hierarchy comes from size, tracking and colour.
+// A single weight, 400, is loaded for both faces. Hierarchy comes from size,
+// tracking and colour alone.
 const ibmPlexSans = IBM_Plex_Sans({
   subsets: ['latin'],
   variable: '--font-sans',
-  weight: ['400', '500'],
+  weight: ['400'],
   display: 'swap',
 });
 
 const plexMono = IBM_Plex_Mono({
   variable: '--font-mono',
   subsets: ['latin'],
-  weight: ['400', '500'],
+  weight: ['400'],
   display: 'swap',
 });
 

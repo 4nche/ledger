@@ -149,7 +149,7 @@ export function PositionForm({
     >
       <div className="space-y-6">
         <section className="space-y-4">
-          <h2 className="text-sm font-medium">Position</h2>
+          <h2 className="text-sm">Position</h2>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <Field data-invalid={errors.accountId !== undefined}>
@@ -211,7 +211,7 @@ export function PositionForm({
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-sm font-medium">Entry</h2>
+          <h2 className="text-sm">Entry</h2>
           <div className="grid gap-4 sm:grid-cols-3">
             <Field data-invalid={errors.openedAt !== undefined}>
               <FieldLabel htmlFor="openedAt">Opened at</FieldLabel>
@@ -274,7 +274,7 @@ export function PositionForm({
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-sm font-medium">
+          <h2 className="text-sm">
             Exit{' '}
             <span className="text-muted-foreground font-normal">— leave blank if still open</span>
           </h2>
@@ -422,9 +422,7 @@ function PreviewPanel({
     <Card className="gap-0" data-testid="preview">
       <CardContent className="space-y-4 px-4">
         <div>
-          <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-            Preview
-          </p>
+          <p className="text-muted-foreground text-xs tracking-wide uppercase">Preview</p>
           <p className="text-muted-foreground mt-0.5 text-xs">
             Calculated with the same rules the server applies on save.
           </p>

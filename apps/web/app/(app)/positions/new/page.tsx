@@ -11,7 +11,7 @@ export default async function NewPositionPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-medium tracking-tight">New Position</h1>
+        <h1 className="text-xl tracking-tight">New Position</h1>
         <p className="text-muted-foreground mt-0.5 text-sm">
           Times are recorded in {context.reportingTimeZone}. Everything else is derived by the
           server.
@@ -27,7 +27,7 @@ export default async function NewPositionPage() {
       {context.failure === null && context.accounts.length === 0 ? (
         <Card>
           <CardContent className="py-10 text-center">
-            <p className="text-sm font-medium">No active accounts</p>
+            <p className="text-sm">No active accounts</p>
             <p className="text-muted-foreground mt-1 text-sm">
               A position needs an account.{' '}
               <Link href="/accounts" className="underline underline-offset-2">

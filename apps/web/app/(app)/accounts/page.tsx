@@ -42,7 +42,7 @@ export default async function AccountsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-medium tracking-tight">Accounts</h1>
+          <h1 className="text-xl tracking-tight">Accounts</h1>
           <p className="text-muted-foreground mt-0.5 text-sm">
             Each account belongs to one trader. Positions inherit their trader from the account.
           </p>
@@ -59,7 +59,7 @@ export default async function AccountsPage() {
       {failure === null && accounts.length === 0 ? (
         <Card>
           <CardContent className="py-10 text-center">
-            <p className="text-sm font-medium">No accounts yet</p>
+            <p className="text-sm">No accounts yet</p>
             <p className="text-muted-foreground mx-auto mt-1 max-w-sm text-sm">
               {traders.length === 0
                 ? 'Create a trader first — accounts must belong to someone.'
@@ -83,7 +83,7 @@ export default async function AccountsPage() {
             <TableBody>
               {accounts.map((account) => (
                 <TableRow key={account.id}>
-                  <TableCell className="font-medium">{account.name}</TableCell>
+                  <TableCell>{account.name}</TableCell>
                   <TableCell className="text-muted-foreground">
                     {traderName.get(account.userId) ?? '—'}
                   </TableCell>

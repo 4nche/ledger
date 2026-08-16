@@ -26,7 +26,7 @@ export default function TradesError({
         <AlertTriangle className="text-destructive mt-0.5 size-4 shrink-0" />
         <div className="space-y-2">
           <div>
-            <p className="text-sm font-medium">Something went wrong loading trades</p>
+            <p className="text-sm">Something went wrong loading trades</p>
             <p className="text-muted-foreground text-sm">
               {error.message === '' ? 'No further detail was reported.' : error.message}
             </p>

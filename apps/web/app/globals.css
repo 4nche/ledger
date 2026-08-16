@@ -5,6 +5,14 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* One weight for the whole application. Redefining the scale rather than
+     hunting down utilities means shadcn's own `font-medium` resolves to 400 as
+     well, without editing a single vendored component. */
+  --font-weight-normal: 400;
+  --font-weight-medium: 400;
+  --font-weight-semibold: 400;
+  --font-weight-bold: 400;
+
   --color-profit: var(--profit);
   --color-loss: var(--loss);
   --color-canvas: var(--canvas);
@@ -192,7 +200,7 @@
     @apply px-3 py-2.5 align-middle;
   }
   [data-slot='table-head'] {
-    @apply text-muted-foreground h-auto px-3 pt-3 pb-2 align-bottom text-[11px] font-medium tracking-[0.08em] uppercase;
+    @apply text-muted-foreground h-auto px-3 pt-3 pb-2 align-bottom text-[11px] tracking-[0.08em] uppercase;
   }
 
   /* Every figure in the application is monospaced and tabular, so digits sit

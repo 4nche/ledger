@@ -56,7 +56,7 @@ export default async function PositionDetailPage({ params }: { params: Promise<{
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <h1 className="font-mono text-xl font-medium tracking-tight">{position.symbol}</h1>
+            <h1 className="font-mono text-xl tracking-tight">{position.symbol}</h1>
             <Badge variant={position.side === 'LONG' ? 'secondary' : 'outline'}>
               {position.side}
             </Badge>
@@ -145,7 +145,7 @@ export default async function PositionDetailPage({ params }: { params: Promise<{
 
       <section className="space-y-3">
         <div className="flex items-baseline gap-2">
-          <h2 className="text-sm font-medium">Executions</h2>
+          <h2 className="text-sm">Executions</h2>
           <p className="text-muted-foreground text-xs">
             The raw facts. Everything above is derived from these.
           </p>
@@ -209,7 +209,7 @@ export default async function PositionDetailPage({ params }: { params: Promise<{
 
       {position.notes !== null && (
         <section className="space-y-2">
-          <h2 className="text-sm font-medium">Notes</h2>
+          <h2 className="text-sm">Notes</h2>
           <p className="text-muted-foreground max-w-3xl text-sm whitespace-pre-wrap">
             {position.notes}
           </p>

@@ -24,7 +24,7 @@ export default async function EditPositionPage({ params }: { params: Promise<{ i
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-medium tracking-tight">
+        <h1 className="text-xl tracking-tight">
           Edit <span className="font-mono">{position.symbol}</span>
         </h1>
         <p className="text-muted-foreground mt-0.5 text-sm">
@@ -35,7 +35,7 @@ export default async function EditPositionPage({ params }: { params: Promise<{ i
       {hasScaledExecutions ? (
         <Card className="border-destructive/40">
           <CardContent className="space-y-1 py-2 text-sm">
-            <p className="font-medium">This position has {position.trades.length} executions</p>
+            <p>This position has {position.trades.length} executions</p>
             <p className="text-muted-foreground">
               The simple form records one entry and one exit, so saving here would discard the
               others. Editing scaled positions arrives with the multi-execution form.

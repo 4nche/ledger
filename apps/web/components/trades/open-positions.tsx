@@ -52,7 +52,7 @@ export function OpenPositions({
   return (
     <section className="space-y-2">
       <header className="flex items-baseline gap-3">
-        <h2 className="text-sm font-medium tracking-wide">OPEN POSITIONS</h2>
+        <h2 className="text-sm tracking-wide">OPEN POSITIONS</h2>
         <span className="text-muted-foreground text-xs">
           Still on risk — excluded from the realized totals above
         </span>
@@ -100,7 +100,7 @@ export function OpenPositions({
                   href={`/positions/${position.id}`}
                   className="hover:bg-muted/50 cursor-pointer"
                 >
-                  <TableCell className="font-mono font-medium">
+                  <TableCell className="font-mono">
                     <Link href={`/positions/${position.id}`} className="hover:underline">
                       {position.symbol}
                     </Link>

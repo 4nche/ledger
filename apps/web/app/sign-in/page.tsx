@@ -33,7 +33,7 @@ export default async function SignInPage({
       <Card>
         <CardContent className="space-y-6 px-6 py-2">
           <div className="space-y-1">
-            <h1 className="text-lg font-medium tracking-tight">Trading Journal</h1>
+            <h1 className="text-lg tracking-tight">Trading Journal</h1>
             <p className="text-muted-foreground text-sm">
               A private journal. Sign in with the Google account on the allowlist.
             </p>

@@ -41,7 +41,7 @@ export default async function TradesPage({
     <div className="space-y-5">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <div>
-          <h1 className="text-xl font-medium tracking-tight">Trades</h1>
+          <h1 className="text-xl tracking-tight">Trades</h1>
           <p className="text-muted-foreground mt-0.5 text-sm">
             One table per period. A row is PnL realized by an exit, so a scaled position appears in
             each period it earned in.
@@ -95,7 +95,7 @@ async function TradesResults({ params }: { params: SearchParams }) {
     return (
       <Card className="border-destructive/40">
         <CardContent className="space-y-1 py-2">
-          <p className="text-sm font-medium">Could not load trades</p>
+          <p className="text-sm">Could not load trades</p>
           <p className="text-muted-foreground text-sm">
             {error instanceof Error ? error.message : 'Unknown error'}
           </p>
@@ -146,7 +146,7 @@ async function TradesResults({ params }: { params: SearchParams }) {
       {groups.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-sm font-medium">Nothing realized in this range</p>
+            <p className="text-sm">Nothing realized in this range</p>
             <p className="text-muted-foreground mx-auto mt-1 max-w-md text-sm">
               Either no exits fall inside these filters, or the positions that match are still open.
               Open positions are listed separately below.

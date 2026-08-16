@@ -18,9 +18,7 @@ export function MetricCard({
   return (
     <Card className="gap-0 py-4">
       <CardContent className="px-4">
-        <p className="text-muted-foreground text-[11px] font-medium tracking-[0.08em] uppercase">
-          {label}
-        </p>
+        <p className="text-muted-foreground text-[11px] tracking-[0.08em] uppercase">{label}</p>
         <p className="figure mt-1 text-2xl tracking-tight">{value}</p>
         {hint !== undefined && <p className="text-muted-foreground mt-0.5 text-xs">{hint}</p>}
       </CardContent>

@@ -40,7 +40,7 @@ export function TraderMenu({ trader }: { trader: Trader }) {
 
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel className="font-normal">
-          <p className="text-sm font-medium">{trader.name}</p>
+          <p className="text-sm">{trader.name}</p>
           <p className="text-muted-foreground truncate text-xs">{trader.email}</p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

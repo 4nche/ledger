@@ -80,7 +80,7 @@ export function PeriodGroup({ group, timeZone }: { group: PeriodGroupResponse; t
     <section className="space-y-2" data-testid="period-group" data-group-key={group.key}>
       <header className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
         <div className="flex items-baseline gap-3">
-          <h2 className="text-sm font-medium tracking-wide">{title}</h2>
+          <h2 className="text-sm tracking-wide">{title}</h2>
           {subtitle !== '' && <span className="text-muted-foreground text-xs">{subtitle}</span>}
         </div>
 
@@ -94,8 +94,8 @@ export function PeriodGroup({ group, timeZone }: { group: PeriodGroupResponse; t
               <Percent value={summary.winRate} fractionDigits={1} signed={false} /> WR
             </span>
           )}
-          <Money value={summary.realizedPnl} className="font-medium" />
-          <RMultiple value={summary.totalR} className="font-medium" />
+          <Money value={summary.realizedPnl} />
+          <RMultiple value={summary.totalR} />
           <span>
             <RMultiple value={summary.averageR} tone={false} /> avg
           </span>
@@ -143,7 +143,7 @@ export function PeriodGroup({ group, timeZone }: { group: PeriodGroupResponse; t
                     }).format(new Date(item.executedAt))}
                   </TableCell>
                 )}
-                <TableCell className="font-mono font-medium">
+                <TableCell className="font-mono">
                   {/* A real link, stretched over the row, so the whole row is
                       clickable without giving up keyboard navigation. */}
                   <Link href={`/positions/${item.positionId}`} className="hover:underline">
