@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation';
 import type { PositionDetailResponse } from '@journal/contracts';
 import { ApiError, apiGet } from '@/lib/api';
 import { PositionForm } from '@/components/positions/position-form';
-import { Card, CardContent } from '@/components/ui/card';
 import { loadFormContext } from '@/lib/server-data';
 
 export const dynamic = 'force-dynamic';
@@ -19,7 +18,6 @@ export default async function EditPositionPage({ params }: { params: Promise<{ i
   }
 
   const context = await loadFormContext();
-  const hasScaledExecutions = position.trades.length > 2;
 
   return (
     <div className="space-y-6">
@@ -32,24 +30,12 @@ export default async function EditPositionPage({ params }: { params: Promise<{ i
         </p>
       </div>
 
-      {hasScaledExecutions ? (
-        <Card className="border-destructive/40">
-          <CardContent className="space-y-1 py-2 text-sm">
-            <p>This position has {position.trades.length} executions</p>
-            <p className="text-muted-foreground">
-              The simple form records one entry and one exit, so saving here would discard the
-              others. Editing scaled positions arrives with the multi-execution form.
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <PositionForm
-          accounts={context.accounts}
-          traderNames={context.traderNames}
-          reportingTimeZone={context.reportingTimeZone}
-          existing={position}
-        />
-      )}
+      <PositionForm
+        accounts={context.accounts}
+        traderNames={context.traderNames}
+        reportingTimeZone={context.reportingTimeZone}
+        existing={position}
+      />
     </div>
   );
 }

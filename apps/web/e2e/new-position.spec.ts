@@ -23,13 +23,20 @@ const SPEC_EXAMPLE = {
 async function fillPosition(page: Page, values: Partial<typeof SPEC_EXAMPLE> = {}) {
   const data = { ...SPEC_EXAMPLE, ...values };
   await page.getByLabel('Symbol').fill(data.symbol);
-  await page.getByLabel('Opened at').fill(data.openedAt);
-  await page.getByLabel('Entry price').fill(data.entryPrice);
-  await page.getByLabel('Quantity').fill(data.quantity);
   await page.getByLabel('Initial stop').fill(data.initialStopPrice);
-  await page.getByLabel('Closed at').fill(data.closedAt);
-  await page.getByLabel('Exit price').fill(data.exitPrice);
-  await page.getByLabel('Fees').fill(data.fees);
+
+  await page.getByLabel('Entry 1 price').fill(data.entryPrice);
+  await page.getByLabel('Entry 1 quantity').fill(data.quantity);
+  await page.getByLabel('Entry 1 time').fill(data.openedAt);
+
+  if (data.exitPrice === '') {
+    // An exit row left blank is simply a position that is still open.
+    return;
+  }
+  await page.getByLabel('Exit 1 price').fill(data.exitPrice);
+  await page.getByLabel('Exit 1 quantity').fill(data.quantity);
+  await page.getByLabel('Exit 1 time').fill(data.closedAt);
+  await page.getByLabel('Exit 1 fee').fill(data.fees);
 }
 
 test.describe('New Position', () => {
@@ -67,7 +74,7 @@ test.describe('New Position', () => {
   });
 
   test('treats a position with no exit as open', async ({ page }) => {
-    await fillPosition(page, { closedAt: '', exitPrice: '' });
+    await fillPosition(page, { exitPrice: '' });
 
     const preview = page.getByTestId('preview');
     await expect(preview).toContainText('Open');
@@ -103,11 +110,11 @@ test.describe('New Position', () => {
 
     // Values come back as the trader entered them, in the reporting timezone.
     await expect(page.getByLabel('Symbol')).toHaveValue('E2EEDIT');
-    await expect(page.getByLabel('Entry price')).toHaveValue('117500');
-    await expect(page.getByLabel('Opened at')).toHaveValue('2026-08-15T10:31');
+    await expect(page.getByLabel('Entry 1 price')).toHaveValue('117500');
+    await expect(page.getByLabel('Entry 1 time')).toHaveValue('2026-08-15T10:31');
     await expect(page.getByLabel('Initial stop')).toHaveValue('115000');
 
-    await page.getByLabel('Exit price').fill('121000');
+    await page.getByLabel('Exit 1 price').fill('121000');
     await page.getByRole('button', { name: 'Save changes' }).click();
     await expect(page).toHaveURL(/\/positions\/[0-9a-f-]{36}$/);
 
@@ -130,5 +137,81 @@ test.describe('New Position', () => {
     // It is gone from the journal, though its executions survive in the database.
     const response = await page.goto(detailUrl);
     expect(response?.status()).toBe(404);
+  });
+});
+
+test.describe('Scaled positions', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/positions/new');
+  });
+
+  test('previews a position scaled in and out across four executions', async ({ page }) => {
+    // The spec's own example: 1 position, 4 executions.
+    await page.getByLabel('Symbol').fill('E2ESCALE');
+
+    await page.getByLabel('Entry 1 price').fill('100000');
+    await page.getByLabel('Entry 1 quantity').fill('0.5');
+    await page.getByLabel('Entry 1 time').fill('2026-08-15T10:31');
+
+    await page.getByRole('button', { name: 'Add entry' }).click();
+    await page.getByLabel('Entry 2 price').fill('101000');
+    await page.getByLabel('Entry 2 quantity').fill('0.25');
+    await page.getByLabel('Entry 2 time').fill('2026-08-15T11:04');
+
+    await page.getByLabel('Exit 1 price').fill('103000');
+    await page.getByLabel('Exit 1 quantity').fill('0.25');
+    await page.getByLabel('Exit 1 time').fill('2026-08-15T14:12');
+
+    await page.getByRole('button', { name: 'Add exit' }).click();
+    await page.getByLabel('Exit 2 price').fill('105000');
+    await page.getByLabel('Exit 2 quantity').fill('0.5');
+    await page.getByLabel('Exit 2 time').fill('2026-08-15T16:42');
+
+    const preview = page.getByTestId('preview');
+    await expect(preview).toContainText('Closed');
+    // Weighted-average basis of 100,333.33… against 78,250 of exits.
+    await expect(preview).toContainText('+$3,000.00');
+    await expect(page.getByTestId('risk-summary')).toContainText('0.75');
+  });
+
+  test('reports overselling as the rows are entered', async ({ page }) => {
+    await page.getByLabel('Symbol').fill('E2EOVER');
+    await page.getByLabel('Entry 1 price').fill('100');
+    await page.getByLabel('Entry 1 quantity').fill('1');
+    await page.getByLabel('Entry 1 time').fill('2026-08-15T10:00');
+    await page.getByLabel('Exit 1 price').fill('110');
+    await page.getByLabel('Exit 1 quantity').fill('2');
+    await page.getByLabel('Exit 1 time').fill('2026-08-15T11:00');
+
+    await expect(page.getByText(/Exit quantity exceeds/)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Save position' })).toBeDisabled();
+  });
+
+  test('saves a partial exit as an open position', async ({ page }) => {
+    await page.getByLabel('Symbol').fill('E2EPARTIAL');
+    await page.getByLabel('Initial stop').fill('90');
+    await page.getByLabel('Entry 1 price').fill('100');
+    await page.getByLabel('Entry 1 quantity').fill('1');
+    await page.getByLabel('Entry 1 time').fill('2026-08-15T10:00');
+    await page.getByLabel('Exit 1 price').fill('110');
+    await page.getByLabel('Exit 1 quantity').fill('0.4');
+    await page.getByLabel('Exit 1 time').fill('2026-08-15T11:00');
+
+    await page.getByRole('button', { name: 'Save position' }).click();
+    await expect(page).toHaveURL(/\/positions\/[0-9a-f-]{36}$/);
+
+    await expect(page.getByTestId('position-headline')).toContainText('+$4.00');
+    await expect(page.getByText('0.6 still open')).toBeVisible();
+  });
+
+  test('removes an execution row', async ({ page }) => {
+    await page.getByRole('button', { name: 'Add entry' }).click();
+    await expect(page.getByLabel('Entry 2 price')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Remove entry 2' }).click();
+    await expect(page.getByLabel('Entry 2 price')).toBeHidden();
+
+    // The last entry cannot be removed: a position needs at least one.
+    await expect(page.getByRole('button', { name: 'Remove entry 1' })).toBeDisabled();
   });
 });

@@ -2,18 +2,12 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm, useWatch } from 'react-hook-form';
+import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { toast } from 'sonner';
 import type { AccountResponse, PositionDetailResponse } from '@journal/contracts';
-import {
-  instantFromLocalDateTime,
-  reconstructPosition,
-  type ExecutionInput,
-  type PositionSide,
-  type PositionSnapshot,
-  type ValidationIssue,
-} from '@journal/domain';
+import { reconstructPosition, type PositionSnapshot, type ValidationIssue } from '@journal/domain';
 import { ApiError, apiSend } from '@/lib/api';
+import { Amount, Money, Percent, RMultiple } from '@/components/figure';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
@@ -27,39 +21,16 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { formatMoney, formatPercent, formatR, formatSignedMoney, pnlToneClass } from '@/lib/format';
-
-/**
- * v1 records one entry and one exit, but stores them as two rows in `trades` —
- * the schema already supports scaling, so adding it later is a UI change only.
- * See the build spec §3.2.
- */
-interface FormValues {
-  accountId: string;
-  symbol: string;
-  side: PositionSide;
-  openedAt: string;
-  entryPrice: string;
-  quantity: string;
-  initialStopPrice: string;
-  closedAt: string;
-  exitPrice: string;
-  fees: string;
-  notes: string;
-}
-
-const DECIMAL_PATTERN = /^\d+(\.\d+)?$/;
-
-const decimalRules = (label: string, required: boolean) => ({
-  ...(required ? { required: `${label} is required.` } : {}),
-  pattern: { value: DECIMAL_PATTERN, message: 'Digits only, e.g. 117500 or 0.125.' },
-  validate: (value: string) =>
-    value === '' || Number(value) > 0 || `${label} must be greater than zero.`,
-});
-
-function emptyToUndefined(value: string): string | undefined {
-  return value.trim() === '' ? undefined : value.trim();
-}
+import { ExecutionRows } from './execution-rows';
+import {
+  DECIMAL_PATTERN,
+  buildDefaults,
+  buildExecutions,
+  buildTrades,
+  emptyRow,
+  emptyToUndefined,
+  type PositionFormValues,
+} from './position-form-values';
 
 export interface PositionFormProps {
   readonly accounts: readonly AccountResponse[];
@@ -69,6 +40,14 @@ export interface PositionFormProps {
   readonly existing?: PositionDetailResponse;
 }
 
+/**
+ * Records a position as a set of executions — one entry and one exit in the
+ * common case, more when a trade was scaled into or out of.
+ *
+ * The preview runs the very same domain functions the server runs on save, so
+ * what a trader sees before saving is what gets stored. Display only: the
+ * browser never persists a value it calculated. See accounting rules §13.
+ */
 export function PositionForm({
   accounts,
   traderNames,
@@ -78,7 +57,7 @@ export function PositionForm({
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const form = useForm<FormValues>({
+  const form = useForm<PositionFormValues>({
     mode: 'onBlur',
     defaultValues: buildDefaults(existing, accounts, reportingTimeZone),
   });
@@ -91,22 +70,32 @@ export function PositionForm({
     formState: { errors, isSubmitting },
   } = form;
 
-  // useWatch subscribes to the fields rather than re-reading them on every
-  // render, so the preview below can be memoised on the values it depends on.
-  const values = useWatch({ control }) as FormValues;
-  const account = accounts.find((candidate) => candidate.id === values.accountId);
+  const entries = useFieldArray({ control, name: 'entries' });
+  const exits = useFieldArray({ control, name: 'exits' });
 
-  // The preview runs the very same domain functions the API uses on save, so
-  // what the trader sees before saving is what gets stored. Display only —
-  // nothing calculated here is ever persisted. See accounting rules §13.
+  const values = useWatch({ control }) as PositionFormValues;
+  const account = accounts.find((candidate) => candidate.id === values.accountId);
   const preview = usePreview(values, account, reportingTimeZone);
 
-  async function onSubmit(formValues: FormValues): Promise<void> {
+  // Flattened so a row can ask about its own field without knowing the shape.
+  const rowErrors = useMemo(() => {
+    const flat: Record<string, string | undefined> = {};
+    for (const kind of ['entries', 'exits'] as const) {
+      errors[kind]?.forEach?.((row, index) => {
+        for (const [field, error] of Object.entries(row ?? {})) {
+          flat[`${kind}.${index}.${field}`] = (error as { message?: string })?.message;
+        }
+      });
+    }
+    return flat;
+  }, [errors]);
+
+  async function onSubmit(formValues: PositionFormValues): Promise<void> {
     setSubmitError(null);
 
     const trades = buildTrades(formValues, reportingTimeZone);
     if (trades === null) {
-      setSubmitError('Check the dates and prices — the executions could not be assembled.');
+      setSubmitError('Check the times and prices — the executions could not be assembled.');
       return;
     }
 
@@ -147,10 +136,8 @@ export function PositionForm({
       noValidate
       className="grid gap-6 lg:grid-cols-[1fr_20rem]"
     >
-      <div className="space-y-6">
+      <div className="space-y-8">
         <section className="space-y-4">
-          <h2 className="text-sm">Position</h2>
-
           <div className="grid gap-4 sm:grid-cols-2">
             <Field data-invalid={errors.accountId !== undefined}>
               <FieldLabel htmlFor="accountId">Account</FieldLabel>
@@ -159,7 +146,7 @@ export function PositionForm({
                 onValueChange={(value) => setValue('accountId', value, { shouldValidate: true })}
               >
                 <SelectTrigger id="accountId" className="w-full">
-                  <SelectValue placeholder="Select an account" />
+                  <SelectValue placeholder="Select an account">{account?.name}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {accounts.map((candidate) => (
@@ -189,66 +176,27 @@ export function PositionForm({
             </Field>
           </div>
 
-          <Field>
-            <FieldLabel>Direction</FieldLabel>
-            <ToggleGroup
-              type="single"
-              value={values.side}
-              onValueChange={(value) => {
-                if (value === 'LONG' || value === 'SHORT') setValue('side', value);
-              }}
-              variant="outline"
-              className="w-fit"
-            >
-              <ToggleGroupItem value="LONG" className="px-6">
-                Long
-              </ToggleGroupItem>
-              <ToggleGroupItem value="SHORT" className="px-6">
-                Short
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </Field>
-        </section>
-
-        <section className="space-y-4">
-          <h2 className="text-sm">Entry</h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            <Field data-invalid={errors.openedAt !== undefined}>
-              <FieldLabel htmlFor="openedAt">Opened at</FieldLabel>
-              <Input
-                id="openedAt"
-                type="datetime-local"
-                {...register('openedAt', { required: 'When did you enter?' })}
-              />
-              {errors.openedAt && <FieldError>{errors.openedAt.message}</FieldError>}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field>
+              <FieldLabel>Direction</FieldLabel>
+              <ToggleGroup
+                type="single"
+                value={values.side}
+                onValueChange={(value) => {
+                  if (value === 'LONG' || value === 'SHORT') setValue('side', value);
+                }}
+                variant="outline"
+                className="w-fit"
+              >
+                <ToggleGroupItem value="LONG" className="px-6">
+                  Long
+                </ToggleGroupItem>
+                <ToggleGroupItem value="SHORT" className="px-6">
+                  Short
+                </ToggleGroupItem>
+              </ToggleGroup>
             </Field>
 
-            <Field data-invalid={errors.entryPrice !== undefined}>
-              <FieldLabel htmlFor="entryPrice">Entry price</FieldLabel>
-              <Input
-                id="entryPrice"
-                inputMode="decimal"
-                autoComplete="off"
-                className="font-mono tabular-nums"
-                {...register('entryPrice', decimalRules('Entry price', true))}
-              />
-              {errors.entryPrice && <FieldError>{errors.entryPrice.message}</FieldError>}
-            </Field>
-
-            <Field data-invalid={errors.quantity !== undefined}>
-              <FieldLabel htmlFor="quantity">Quantity</FieldLabel>
-              <Input
-                id="quantity"
-                inputMode="decimal"
-                autoComplete="off"
-                className="font-mono tabular-nums"
-                {...register('quantity', decimalRules('Quantity', true))}
-              />
-              {errors.quantity && <FieldError>{errors.quantity.message}</FieldError>}
-            </Field>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-3">
             <Field data-invalid={errors.initialStopPrice !== undefined}>
               <FieldLabel htmlFor="initialStopPrice">Initial stop</FieldLabel>
               <Input
@@ -256,7 +204,9 @@ export function PositionForm({
                 inputMode="decimal"
                 autoComplete="off"
                 className="font-mono tabular-nums"
-                {...register('initialStopPrice', decimalRules('Initial stop', false))}
+                {...register('initialStopPrice', {
+                  pattern: { value: DECIMAL_PATTERN, message: 'Digits only.' },
+                })}
               />
               {errors.initialStopPrice ? (
                 <FieldError>{errors.initialStopPrice.message}</FieldError>
@@ -266,55 +216,28 @@ export function PositionForm({
                 </p>
               )}
             </Field>
-
-            <div className="sm:col-span-2">
-              <RiskSummary preview={preview} currency={account?.currency ?? 'USD'} />
-            </div>
           </div>
+
+          <RiskSummary preview={preview} currency={account?.currency ?? 'USD'} />
         </section>
 
-        <section className="space-y-4">
-          <h2 className="text-sm">
-            Exit{' '}
-            <span className="text-muted-foreground font-normal">— leave blank if still open</span>
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            <Field>
-              <FieldLabel htmlFor="closedAt">Closed at</FieldLabel>
-              <Input id="closedAt" type="datetime-local" {...register('closedAt')} />
-            </Field>
+        <ExecutionRows
+          kind="entries"
+          fields={entries.fields}
+          register={register}
+          onAppend={() => entries.append(emptyRow())}
+          onRemove={(index) => entries.remove(index)}
+          errors={rowErrors}
+        />
 
-            <Field data-invalid={errors.exitPrice !== undefined}>
-              <FieldLabel htmlFor="exitPrice">Exit price</FieldLabel>
-              <Input
-                id="exitPrice"
-                inputMode="decimal"
-                autoComplete="off"
-                className="font-mono tabular-nums"
-                {...register('exitPrice', decimalRules('Exit price', false))}
-              />
-              {errors.exitPrice && <FieldError>{errors.exitPrice.message}</FieldError>}
-            </Field>
-
-            <Field data-invalid={errors.fees !== undefined}>
-              <FieldLabel htmlFor="fees">Fees</FieldLabel>
-              <Input
-                id="fees"
-                inputMode="decimal"
-                autoComplete="off"
-                className="font-mono tabular-nums"
-                {...register('fees', {
-                  pattern: { value: DECIMAL_PATTERN, message: 'Digits only.' },
-                })}
-              />
-              {errors.fees ? (
-                <FieldError>{errors.fees.message}</FieldError>
-              ) : (
-                <p className="text-muted-foreground text-xs">Recorded against the exit.</p>
-              )}
-            </Field>
-          </div>
-        </section>
+        <ExecutionRows
+          kind="exits"
+          fields={exits.fields}
+          register={register}
+          onAppend={() => exits.append(emptyRow())}
+          onRemove={(index) => exits.remove(index)}
+          errors={rowErrors}
+        />
 
         <section className="space-y-2">
           <FieldLabel htmlFor="notes">Notes</FieldLabel>
@@ -350,7 +273,7 @@ interface Preview {
 }
 
 function usePreview(
-  values: FormValues,
+  values: PositionFormValues,
   account: AccountResponse | undefined,
   timeZone: string,
 ): Preview {
@@ -383,18 +306,24 @@ function RiskSummary({ preview, currency }: { preview: Preview; currency: string
   return (
     <div
       data-testid="risk-summary"
-      className="bg-muted/40 flex h-full items-center gap-6 rounded-md px-4 py-3 text-sm"
+      className="bg-muted/40 flex items-center gap-8 rounded-md px-4 py-3 text-sm"
     >
       <div>
         <p className="text-muted-foreground text-xs">Risk</p>
-        <p className="font-mono tabular-nums">
-          {risk === null ? '—' : formatMoney(risk, currency)}
+        <p className="figure">
+          <Money value={risk} currency={currency} signed={false} tone={false} />
         </p>
       </div>
       <div>
         <p className="text-muted-foreground text-xs">of balance</p>
-        <p className="font-mono tabular-nums">
-          {formatPercent(preview.snapshot?.initialRiskPct ?? null, 2, { signed: false })}
+        <p className="figure">
+          <Percent value={preview.snapshot?.initialRiskPct ?? null} signed={false} />
+        </p>
+      </div>
+      <div>
+        <p className="text-muted-foreground text-xs">Size</p>
+        <p className="figure">
+          <Amount value={preview.snapshot?.entryQuantity ?? null} />
         </p>
       </div>
     </div>
@@ -432,29 +361,26 @@ function PreviewPanel({
           <p className="text-muted-foreground text-sm">
             {ready && issues.length > 0
               ? 'This does not describe a valid position yet.'
-              : 'Fill in the entry to see PnL and R.'}
+              : 'Fill in an entry to see PnL and R.'}
           </p>
         ) : (
           <dl className="space-y-2.5">
             <Row label="Status" value={snapshot.status === 'CLOSED' ? 'Closed' : 'Open'} />
             <Row
               label="Realized PnL"
-              value={formatSignedMoney(snapshot.realizedPnl, currency)}
-              tone={pnlToneClass(snapshot.realizedPnl)}
+              value={<Money value={snapshot.realizedPnl} currency={currency} />}
             />
+            <Row label="Return" value={<Percent value={snapshot.realizedPnlPct} tone />} />
+            <Row label="R multiple" value={<RMultiple value={snapshot.rMultiple} />} />
+            <Row label="Avg entry" value={<Amount value={snapshot.averageEntryPrice} />} />
+            <Row label="Avg exit" value={<Amount value={snapshot.averageExitPrice} />} />
+            <Row label="Still open" value={<Amount value={snapshot.openQuantity} />} />
             <Row
-              label="Return"
-              value={formatPercent(snapshot.realizedPnlPct)}
-              tone={pnlToneClass(snapshot.realizedPnl)}
+              label="Fees"
+              value={
+                <Money value={snapshot.fees} currency={currency} signed={false} tone={false} />
+              }
             />
-            <Row
-              label="R multiple"
-              value={formatR(snapshot.rMultiple)}
-              tone={pnlToneClass(snapshot.rMultiple)}
-            />
-            <Row label="Avg entry" value={snapshot.averageEntryPrice} mono />
-            <Row label="Avg exit" value={snapshot.averageExitPrice ?? '—'} mono />
-            <Row label="Fees" value={formatMoney(snapshot.fees, currency)} mono />
           </dl>
         )}
 
@@ -481,141 +407,11 @@ function PreviewPanel({
   );
 }
 
-function Row({
-  label,
-  value,
-  tone,
-  mono,
-}: {
-  label: string;
-  value: string;
-  tone?: string;
-  mono?: boolean;
-}) {
+function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-baseline justify-between gap-4 text-sm">
       <dt className="text-muted-foreground">{label}</dt>
-      <dd className={`${mono === true ? 'font-mono' : 'font-mono'} tabular-nums ${tone ?? ''}`}>
-        {value}
-      </dd>
+      <dd className="figure">{value}</dd>
     </div>
   );
-}
-
-// --- Value assembly --------------------------------------------------------
-
-/** Builds domain executions, or null when the form is not yet complete enough. */
-function buildExecutions(values: FormValues, timeZone: string): ExecutionInput[] | null {
-  const entryPrice = emptyToUndefined(values.entryPrice);
-  const quantity = emptyToUndefined(values.quantity);
-  const openedAt = emptyToUndefined(values.openedAt);
-
-  if (entryPrice === undefined || quantity === undefined || openedAt === undefined) return null;
-  if (!DECIMAL_PATTERN.test(entryPrice) || !DECIMAL_PATTERN.test(quantity)) return null;
-
-  const exitPrice = emptyToUndefined(values.exitPrice);
-  const closedAt = emptyToUndefined(values.closedAt);
-  const hasExit =
-    exitPrice !== undefined && closedAt !== undefined && DECIMAL_PATTERN.test(exitPrice);
-  const fees = emptyToUndefined(values.fees) ?? '0';
-
-  try {
-    const entryAt = instantFromLocalDateTime(openedAt, timeZone);
-    const executions: ExecutionInput[] = [
-      {
-        id: 'preview-entry',
-        type: 'ENTRY',
-        price: entryPrice,
-        quantity,
-        // A single fee field belongs to the exit when there is one; on a still
-        // open position there is nowhere else to put it.
-        fee: hasExit ? '0' : fees,
-        executedAt: entryAt,
-        createdAt: new Date(0),
-      },
-    ];
-
-    if (hasExit) {
-      executions.push({
-        id: 'preview-exit',
-        type: 'EXIT',
-        price: exitPrice,
-        quantity,
-        fee: fees,
-        executedAt: instantFromLocalDateTime(closedAt, timeZone),
-        createdAt: new Date(1),
-      });
-    }
-
-    return executions;
-  } catch {
-    // A half-typed date is normal while the form is being filled in.
-    return null;
-  }
-}
-
-/** The same executions, shaped for the API. */
-function buildTrades(values: FormValues, timeZone: string): Array<Record<string, string>> | null {
-  const executions = buildExecutions(values, timeZone);
-  if (executions === null) return null;
-
-  return executions.map((execution) => ({
-    type: execution.type,
-    price: execution.price,
-    quantity: execution.quantity,
-    fee: execution.fee,
-    executedAt: execution.executedAt.toISOString(),
-  }));
-}
-
-function buildDefaults(
-  existing: PositionDetailResponse | undefined,
-  accounts: readonly AccountResponse[],
-  timeZone: string,
-): FormValues {
-  if (existing === undefined) {
-    return {
-      accountId: accounts[0]?.id ?? '',
-      symbol: '',
-      side: 'LONG',
-      openedAt: '',
-      entryPrice: '',
-      quantity: '',
-      initialStopPrice: '',
-      closedAt: '',
-      exitPrice: '',
-      fees: '',
-      notes: '',
-    };
-  }
-
-  const entry = existing.trades.find((trade) => trade.type === 'ENTRY');
-  const exit = existing.trades.find((trade) => trade.type === 'EXIT');
-
-  return {
-    accountId: existing.accountId,
-    symbol: existing.symbol,
-    side: existing.side,
-    openedAt: entry === undefined ? '' : toLocalInput(entry.executedAt, timeZone),
-    entryPrice: entry?.price ?? '',
-    quantity: entry?.quantity ?? '',
-    initialStopPrice: existing.initialStopPrice ?? '',
-    closedAt: exit === undefined ? '' : toLocalInput(exit.executedAt, timeZone),
-    exitPrice: exit?.price ?? '',
-    fees: existing.fees,
-    notes: existing.notes ?? '',
-  };
-}
-
-function toLocalInput(iso: string, timeZone: string): string {
-  const formatted = new Intl.DateTimeFormat('sv-SE', {
-    timeZone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  }).format(new Date(iso));
-  return formatted.replace(' ', 'T');
 }

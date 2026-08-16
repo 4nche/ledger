@@ -47,7 +47,7 @@ export function OpenPositions({
   if (positions.length === 0) return null;
 
   // Same eleven columns as a day table, which carries no leading date column.
-  const { date: _date, ...columns } = REALIZED_COLUMNS;
+  const columns = Object.entries(REALIZED_COLUMNS).filter(([key]) => key !== 'date');
 
   return (
     <section className="space-y-2">
@@ -61,7 +61,7 @@ export function OpenPositions({
       <div className="border-border/60 overflow-x-auto rounded-lg border">
         <Table className="table-fixed" style={{ minWidth: MIN_TABLE_WIDTH }}>
           <colgroup>
-            {Object.entries(columns).map(([key, width]) => (
+            {columns.map(([key, width]) => (
               <col key={key} style={width === undefined ? undefined : { width }} />
             ))}
           </colgroup>
