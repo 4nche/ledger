@@ -4,6 +4,7 @@ import sensible from '@fastify/sensible';
 import Fastify, { type FastifyInstance } from 'fastify';
 import { sql } from 'drizzle-orm';
 import type { Config } from './config';
+import { authPlugin } from './plugins/auth';
 import { databasePlugin } from './plugins/database';
 import { errorHandler } from './plugins/error-handler';
 import { accountRoutes } from './modules/accounts/routes';
@@ -26,6 +27,7 @@ export async function buildServer(config: Config): Promise<FastifyInstance> {
   await app.register(sensible);
   await app.register(cors, { origin: config.WEB_ORIGIN, credentials: true });
   await app.register(databasePlugin, { connectionString: config.DATABASE_URL });
+  await app.register(authPlugin, { config });
 
   /** Liveness plus a real database round-trip — a server that cannot reach
    *  PostgreSQL is not healthy, however well it answers HTTP. */
@@ -36,6 +38,14 @@ export async function buildServer(config: Config): Promise<FastifyInstance> {
       reportingTimeZone: config.REPORTING_TIMEZONE,
     });
   });
+
+  /** Who am I, according to the server that can actually check. */
+  app.get('/session', async (request) =>
+    apiSuccess({
+      trader: request.trader,
+      reportingTimeZone: config.REPORTING_TIMEZONE,
+    }),
+  );
 
   await app.register(accountRoutes);
   await app.register(positionRoutes);

@@ -37,9 +37,17 @@ packages/
   contracts/  Zod schemas shared between web and api
   db/         Drizzle schema, migrations, client
   config/     shared tsconfig presets
+  auth/       Better Auth instance, shared by both apps
 docs/
   accounting-rules.md   <- authoritative definition of every derived number
+  authentication.md     <- Google sign-in and the allowlist
 ```
+
+## Signing in
+
+The API will not start without Google OAuth credentials and an allowlist in
+`.env`. Setting them up takes about five minutes in the Google Cloud Console —
+see [docs/authentication.md](docs/authentication.md).
 
 Dependencies flow one way:
 

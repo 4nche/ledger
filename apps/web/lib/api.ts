@@ -46,13 +46,40 @@ function urlFor(path: string): string {
   return isServer ? `${SERVER_BASE_URL}${normalised}` : `/api${normalised}`;
 }
 
+/**
+ * Server components call the API directly rather than through the browser, so
+ * nothing attaches the caller's credentials for them. Without this the API
+ * would answer every server-rendered page with a 401.
+ *
+ * Both forms are forwarded: the cookie a browser sends, and the bearer token a
+ * non-browser client sends.
+ */
+async function forwardedCredentials(): Promise<Record<string, string>> {
+  if (!isServer) return {};
+
+  const { headers } = await import('next/headers');
+  const incoming = await headers();
+  const forwarded: Record<string, string> = {};
+
+  const cookie = incoming.get('cookie');
+  if (cookie !== null) forwarded['cookie'] = cookie;
+
+  const authorization = incoming.get('authorization');
+  if (authorization !== null) forwarded['authorization'] = authorization;
+
+  return forwarded;
+}
+
 async function request<TData>(path: string, init?: RequestInit): Promise<ApiResponse<TData>> {
   let response: Response;
+  const credentials = await forwardedCredentials();
 
   try {
     response = await fetch(urlFor(path), {
       ...init,
+      credentials: 'include',
       headers: {
+        ...credentials,
         // Only declare a JSON body when there is one. Fastify rejects an empty
         // body sent with a JSON content-type, which would turn every DELETE
         // into a 400.

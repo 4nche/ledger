@@ -15,7 +15,13 @@ const nextConfig: NextConfig = {
    */
   async rewrites() {
     const apiBaseUrl = process.env['API_BASE_URL'] ?? 'http://127.0.0.1:4000';
-    return [{ source: '/api/:path*', destination: `${apiBaseUrl}/:path*` }];
+    return [
+      // Auth routes keep their /api/auth prefix, because that is the path Google
+      // was told to redirect to and the path the cookie is scoped to. Order
+      // matters: this must match before the general rule strips the prefix.
+      { source: '/api/auth/:path*', destination: `${apiBaseUrl}/api/auth/:path*` },
+      { source: '/api/:path*', destination: `${apiBaseUrl}/:path*` },
+    ];
   },
 };
 

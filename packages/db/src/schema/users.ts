@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { pgTable, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
+import { boolean, pgTable, text, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
 import { timestampColumn } from './columns';
 import { accounts } from './accounts';
 
@@ -13,6 +13,10 @@ export const users = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     name: varchar('name', { length: 120 }).notNull(),
     email: varchar('email', { length: 255 }).notNull(),
+    // Required by Better Auth's user model. Google verifies the address before
+    // it ever reaches us, so this is true for every row it creates.
+    emailVerified: boolean('email_verified').notNull().default(false),
+    image: text('image'),
     createdAt: timestampColumn('created_at').notNull().defaultNow(),
     updatedAt: timestampColumn('updated_at').notNull().defaultNow(),
   },

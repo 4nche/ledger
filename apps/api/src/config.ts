@@ -11,7 +11,21 @@ const configSchema = z.object({
   API_PORT: z.coerce.number().int().min(1).max(65535).default(4000),
   API_HOST: z.string().default('127.0.0.1'),
   REPORTING_TIMEZONE: timeZoneString.default(DEFAULT_REPORTING_TIME_ZONE),
-  WEB_ORIGIN: z.string().default('http://localhost:3000'),
+  /** The browser-facing origin. Sessions and CORS are both anchored to it. */
+  WEB_ORIGIN: z.url({ error: 'WEB_ORIGIN must be a full URL.' }).default('http://localhost:3000'),
+
+  // --- Authentication ---
+  // No defaults: a fallback secret is a published secret, and a missing Google
+  // credential should stop the server rather than fail at first sign-in.
+  BETTER_AUTH_SECRET: z
+    .string()
+    .min(32, { error: 'BETTER_AUTH_SECRET must be at least 32 characters.' }),
+  GOOGLE_CLIENT_ID: z.string().min(1, { error: 'GOOGLE_CLIENT_ID is required.' }),
+  GOOGLE_CLIENT_SECRET: z.string().min(1, { error: 'GOOGLE_CLIENT_SECRET is required.' }),
+  /** Comma-separated Google addresses permitted to sign in. */
+  ALLOWED_EMAILS: z.string().min(1, {
+    error: 'ALLOWED_EMAILS is required — without it nobody can sign in.',
+  }),
 });
 
 export type Config = z.infer<typeof configSchema>;

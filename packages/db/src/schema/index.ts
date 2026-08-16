@@ -9,3 +9,13 @@ export type { NewPositionRow, PositionRow } from './positions';
 
 export { trades, tradesRelations } from './trades';
 export type { NewTradeRow, TradeRow } from './trades';
+
+export {
+  authAccounts,
+  authAccountsRelations,
+  authSchema,
+  authSessions,
+  authSessionsRelations,
+  authVerifications,
+} from './auth';
+export type { AuthAccountRow, AuthSessionRow } from './auth';

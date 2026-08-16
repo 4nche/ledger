@@ -13,7 +13,8 @@ if (!url) {
   process.exit(1);
 }
 
-const sql = postgres(url, { max: 1 });
+// Suppress "already exists, skipping" notices; they are not problems.
+const sql = postgres(url, { max: 1, onnotice: () => {} });
 
 try {
   await migrate(drizzle(sql), {

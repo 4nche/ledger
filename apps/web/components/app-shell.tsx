@@ -3,6 +3,8 @@ import type { ReactNode } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ApiStatus } from '@/components/api-status';
+import { TraderMenu } from '@/components/auth/trader-menu';
+import type { Trader } from '@/lib/session';
 
 const NAV_ITEMS = [
   { href: '/', label: 'Overview' },
@@ -14,7 +16,7 @@ const NAV_ITEMS = [
  * The application chrome: a single top bar, and nothing else competing for
  * attention. Density over decoration — the tables are the product.
  */
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({ children, trader }: { children: ReactNode; trader: Trader }) {
   return (
     <div className="flex min-h-full flex-col">
       <header className="border-border/60 bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky top-0 z-40 border-b backdrop-blur">
@@ -43,6 +45,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 New Position
               </Link>
             </Button>
+            <TraderMenu trader={trader} />
           </div>
         </div>
       </header>

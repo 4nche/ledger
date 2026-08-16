@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { accounts, positions, trades, users } from '@journal/db';
+import { accounts, authSessions, positions, trades, users } from '@journal/db';
 import { eq, inArray } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -17,15 +17,22 @@ import { buildServer } from './server';
 let app: FastifyInstance;
 let accountId: string;
 let userId: string;
+let sessionToken: string;
 const createdPositions: string[] = [];
 
 type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
-async function call(method: Method, url: string, payload?: unknown) {
+/**
+ * Every request carries the test session. The bearer plugin exists for exactly
+ * this kind of non-browser client, so the tests authenticate the same way a
+ * future importer or mobile app would — no test-only bypass in the server.
+ */
+async function call(method: Method, url: string, payload?: unknown, authenticated = true) {
+  const headers = authenticated ? { authorization: `Bearer ${sessionToken}` } : {};
   const response =
     payload === undefined
-      ? await app.inject({ method, url })
-      : await app.inject({ method, url, payload: payload as object });
+      ? await app.inject({ method, url, headers })
+      : await app.inject({ method, url, headers, payload: payload as object });
   // 204 responses carry no body to parse.
   const body = response.body.length === 0 ? {} : (response.json() as Record<string, unknown>);
   return { status: response.statusCode, body };
@@ -83,9 +90,18 @@ beforeAll(async () => {
     currency: 'USD',
     startingBalance: '100000',
   });
+
+  sessionToken = randomUUID().replace(/-/g, '') + randomUUID().replace(/-/g, '');
+  await app.db.insert(authSessions).values({
+    id: randomUUID(),
+    userId,
+    token: sessionToken,
+    expiresAt: new Date(Date.now() + 86_400_000),
+  });
 });
 
 afterAll(async () => {
+  await app.db.delete(authSessions).where(eq(authSessions.userId, userId));
   if (createdPositions.length > 0) {
     await app.db.delete(trades).where(inArray(trades.positionId, createdPositions));
     await app.db.delete(positions).where(inArray(positions.id, createdPositions));
@@ -327,5 +343,65 @@ describe('error envelope', () => {
   it('422s a malformed uuid in the path', async () => {
     const { status } = await call('GET', '/positions/not-a-uuid');
     expect(status).toBe(422);
+  });
+});
+
+describe('authentication', () => {
+  it.each([
+    ['GET', '/accounts'],
+    ['GET', '/positions'],
+    ['GET', '/analytics/overview'],
+    ['GET', '/symbols'],
+    ['GET', '/session'],
+    ['POST', '/positions'],
+  ] as const)('refuses %s %s without a session', async (method, url) => {
+    const { status, body } = await call(method, url, undefined, false);
+    expect(status).toBe(401);
+    expect(body['success']).toBe(false);
+  });
+
+  it('leaves /health public, so a probe needs no credentials', async () => {
+    const { status } = await call('GET', '/health', undefined, false);
+    expect(status).toBe(200);
+  });
+
+  it('rejects a token that does not exist', async () => {
+    const response = await app.inject({
+      method: 'GET',
+      url: '/accounts',
+      headers: { authorization: `Bearer ${randomUUID()}` },
+    });
+    expect(response.statusCode).toBe(401);
+  });
+
+  it('rejects an expired session rather than trusting the token alone', async () => {
+    const expiredToken = randomUUID().replace(/-/g, '');
+    await app.db.insert(authSessions).values({
+      id: randomUUID(),
+      userId,
+      token: expiredToken,
+      expiresAt: new Date(Date.now() - 1000),
+    });
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/accounts',
+      headers: { authorization: `Bearer ${expiredToken}` },
+    });
+    expect(response.statusCode).toBe(401);
+  });
+
+  it('reports the signed-in trader on /session', async () => {
+    const { status, body } = await call('GET', '/session');
+    const data = dataOf(body);
+    expect(status).toBe(200);
+    expect((data['trader'] as Record<string, unknown>)['id']).toBe(userId);
+    expect(data['reportingTimeZone']).toBe('Europe/Amsterdam');
+  });
+
+  it('keeps the sign-in routes reachable without a session', async () => {
+    // Otherwise nobody could ever begin authenticating.
+    const response = await app.inject({ method: 'GET', url: '/api/auth/ok' });
+    expect(response.statusCode).not.toBe(401);
   });
 });

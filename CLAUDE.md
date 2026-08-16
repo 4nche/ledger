@@ -30,6 +30,19 @@ gradients, no glassmorphism, no decorative animation, no marketing styling.
 Tailwind is for layout, spacing, and sizing — not for inventing a new design system per
 screen.
 
+## Authentication
+
+Google sign-in via Better Auth; see [docs/authentication.md](docs/authentication.md).
+
+Signing in with Google is authentication. `ALLOWED_EMAILS` is authorisation, and
+it is the only thing keeping strangers out — an empty list denies everyone, and
+the API refuses to start without one. Never add a domain wildcard: it is
+indistinguishable from a typo and fails open.
+
+The API validates every request itself rather than trusting a header from the web
+app. New routes are protected by default; the exemption list lives in
+`apps/api/src/plugins/auth.ts` and should stay tiny.
+
 ## Testing
 
 Financial calculations are TDD, no exceptions: failing test first, then implementation.
