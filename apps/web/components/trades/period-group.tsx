@@ -10,13 +10,21 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Amount, Money, Percent, RBar, RMultiple } from '@/components/figure';
+import { MIN_TABLE_WIDTH, REALIZED_COLUMNS } from './columns';
 import { formatDuration, pluralise } from '@/lib/format';
 
-/**
- * One table per period, as the spec requires — not one table with a date
- * column. The heading carries the group's own totals, so a trader reads a
- * day's result without adding rows up.
- */
+/** Pins this table to the grid every other table on the page uses. */
+function Columns({ showDate }: { showDate: boolean }) {
+  const { date, ...rest } = REALIZED_COLUMNS;
+  return (
+    <colgroup>
+      {showDate && <col style={{ width: date }} />}
+      {Object.entries(rest).map(([key, width]) => (
+        <col key={key} style={width === undefined ? undefined : { width }} />
+      ))}
+    </colgroup>
+  );
+}
 
 function headingFor(
   group: PeriodGroupResponse,
@@ -56,6 +64,11 @@ function headingFor(
   }
 }
 
+/**
+ * One table per period, as the spec requires — not one table with a date
+ * column. The heading carries the group's own totals, so a trader reads a
+ * day's result without adding rows up.
+ */
 export function PeriodGroup({ group, timeZone }: { group: PeriodGroupResponse; timeZone: string }) {
   const { title, subtitle } = headingFor(group, timeZone);
   const { summary } = group;
@@ -89,7 +102,8 @@ export function PeriodGroup({ group, timeZone }: { group: PeriodGroupResponse; t
       </header>
 
       <div className="border-border/60 overflow-x-auto rounded-lg border">
-        <Table>
+        <Table className="table-fixed" style={{ minWidth: MIN_TABLE_WIDTH }}>
+          <Columns showDate={showDate} />
           <TableHeader>
             <TableRow>
               {showDate && <TableHead>Realized</TableHead>}
@@ -139,10 +153,8 @@ export function PeriodGroup({ group, timeZone }: { group: PeriodGroupResponse; t
                     {item.side}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-muted-foreground whitespace-nowrap">
-                  {item.accountName}
-                </TableCell>
-                <TableCell className="text-muted-foreground">{item.traderName}</TableCell>
+                <TableCell className="text-muted-foreground truncate">{item.accountName}</TableCell>
+                <TableCell className="text-muted-foreground truncate">{item.traderName}</TableCell>
                 <TableCell className="text-right">
                   <Amount value={item.averageEntryPrice} />
                 </TableCell>
