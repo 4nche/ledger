@@ -60,8 +60,10 @@
      appears as a FILL, and --profit is the only green that appears as TEXT.
      Green text is always money; a green fill is never money. */
 
-  --canvas: #f9f9f9; /* neutral off-white page */
-  --surface: #ffffff; /* panels sit on the canvas */
+  --canvas: #ffffff; /* pure white page */
+  /* Same white as the canvas: with no tonal difference, panels are defined by
+     their hairline alone. That is the whole job the hairline now does. */
+  --surface: #ffffff;
   --ink: #1a1a1a;
   --ink-muted: #6b6b6b;
   --hairline: #e7e7e7; /* the only separator in the design */
