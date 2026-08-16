@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { LinkedRow } from './linked-row';
 import { Amount, Money, Percent, RBar, RMultiple } from '@/components/figure';
 import { MIN_TABLE_WIDTH, REALIZED_COLUMNS } from './columns';
 
@@ -94,12 +95,13 @@ export function OpenPositions({
               const realized = Number(position.realizedPnl) === 0 ? null : position.realizedPnl;
 
               return (
-                <TableRow key={position.id} className="hover:bg-muted/50 relative">
+                <LinkedRow
+                  key={position.id}
+                  href={`/positions/${position.id}`}
+                  className="hover:bg-muted/50 cursor-pointer"
+                >
                   <TableCell className="font-mono font-medium">
-                    <Link
-                      href={`/positions/${position.id}`}
-                      className="after:absolute after:inset-0 focus-visible:underline"
-                    >
+                    <Link href={`/positions/${position.id}`} className="hover:underline">
                       {position.symbol}
                     </Link>
                   </TableCell>
@@ -140,7 +142,7 @@ export function OpenPositions({
                       month: 'short',
                     }).format(new Date(position.openedAt))}
                   </TableCell>
-                </TableRow>
+                </LinkedRow>
               );
             })}
           </TableBody>

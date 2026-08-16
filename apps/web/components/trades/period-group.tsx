@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { LinkedRow } from './linked-row';
 import { Amount, Money, Percent, RBar, RMultiple } from '@/components/figure';
 import { MIN_TABLE_WIDTH, REALIZED_COLUMNS } from './columns';
 import { formatDuration, pluralise } from '@/lib/format';
@@ -128,7 +129,11 @@ export function PeriodGroup({ group, timeZone }: { group: PeriodGroupResponse; t
           </TableHeader>
           <TableBody>
             {group.items.map((item) => (
-              <TableRow key={item.tradeId} className="hover:bg-muted/50 relative">
+              <LinkedRow
+                key={item.tradeId}
+                href={`/positions/${item.positionId}`}
+                className="hover:bg-muted/50 cursor-pointer"
+              >
                 {showDate && (
                   <TableCell className="text-muted-foreground whitespace-nowrap">
                     {new Intl.DateTimeFormat('en-GB', {
@@ -141,10 +146,7 @@ export function PeriodGroup({ group, timeZone }: { group: PeriodGroupResponse; t
                 <TableCell className="font-mono font-medium">
                   {/* A real link, stretched over the row, so the whole row is
                       clickable without giving up keyboard navigation. */}
-                  <Link
-                    href={`/positions/${item.positionId}`}
-                    className="after:absolute after:inset-0 focus-visible:underline"
-                  >
+                  <Link href={`/positions/${item.positionId}`} className="hover:underline">
                     {item.symbol}
                   </Link>
                 </TableCell>
@@ -180,7 +182,7 @@ export function PeriodGroup({ group, timeZone }: { group: PeriodGroupResponse; t
                 <TableCell className="text-muted-foreground text-right whitespace-nowrap">
                   {formatDuration(item.holdingSeconds)}
                 </TableCell>
-              </TableRow>
+              </LinkedRow>
             ))}
           </TableBody>
         </Table>
