@@ -1,12 +1,14 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-@import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-profit: var(--profit);
+  --color-loss: var(--loss);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
@@ -51,72 +53,109 @@
 }
 
 :root {
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.147 0.004 49.25);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.147 0.004 49.25);
-  --primary: oklch(0.216 0.006 56.043);
-  --primary-foreground: oklch(0.985 0.001 106.423);
-  --secondary: oklch(0.97 0.001 106.424);
-  --secondary-foreground: oklch(0.216 0.006 56.043);
-  --muted: oklch(0.97 0.001 106.424);
-  --muted-foreground: oklch(0.553 0.013 58.071);
-  --accent: oklch(0.97 0.001 106.424);
-  --accent-foreground: oklch(0.216 0.006 56.043);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.923 0.003 48.717);
-  --input: oklch(0.923 0.003 48.717);
-  --ring: oklch(0.709 0.01 56.259);
-  --chart-1: oklch(0.879 0.169 91.605);
-  --chart-2: oklch(0.769 0.188 70.08);
-  --chart-3: oklch(0.666 0.179 58.318);
-  --chart-4: oklch(0.555 0.163 48.998);
-  --chart-5: oklch(0.473 0.137 46.201);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0.001 106.423);
-  --sidebar-foreground: oklch(0.147 0.004 49.25);
-  --sidebar-primary: oklch(0.216 0.006 56.043);
-  --sidebar-primary-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-accent: oklch(0.97 0.001 106.424);
-  --sidebar-accent-foreground: oklch(0.216 0.006 56.043);
-  --sidebar-border: oklch(0.923 0.003 48.717);
-  --sidebar-ring: oklch(0.709 0.01 56.259);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.147 0.004 49.25);
+  /* --- The journal palette -------------------------------------------------
+     Hex rather than oklch: these are meant to be read and adjusted by hand.
+
+     The rule that keeps green unambiguous: --primary is the only green that
+     appears as a FILL, and --profit is the only green that appears as TEXT.
+     Green text is always money; a green fill is never money. */
+
+  --canvas: #f1f0ec; /* warm grey page, deliberately not cream */
+  --surface: #ffffff; /* panels sit on the canvas */
+  --ink: #1a1917; /* warm near-black */
+  --ink-muted: #6e6b66;
+  --hairline: #e4e1da; /* the only separator in the design */
+
+  --profit: #12a150; /* text only */
+  --loss: #c0442c; /* text only — warm brick, tuned to the canvas */
+
+  /* --- shadcn semantic tokens ---------------------------------------------- */
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+
+  --primary: #0f7b4f; /* fills only: buttons, selected chips */
+  --primary-foreground: #ffffff;
+  --secondary: #e9e7e1;
+  --secondary-foreground: var(--ink);
+  --muted: #e9e7e1;
+  --muted-foreground: var(--ink-muted);
+  --accent: #e6e4dd; /* shadcn's hover surface, not a brand colour */
+  --accent-foreground: var(--ink);
+  --destructive: var(--loss);
+
+  --border: var(--hairline);
+  --input: var(--hairline);
+  --ring: #0f7b4f;
+
+  --chart-1: #0f7b4f;
+  --chart-2: #c0442c;
+  --chart-3: #6e6b66;
+  --chart-4: #a89f8c;
+  --chart-5: #1a1917;
+
+  --radius: 0.75rem;
+
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: #0f7b4f;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e6e4dd;
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: var(--hairline);
+  --sidebar-ring: #0f7b4f;
 }
 
 .dark {
-  --background: oklch(0.147 0.004 49.25);
-  --foreground: oklch(0.985 0.001 106.423);
-  --card: oklch(0.216 0.006 56.043);
-  --card-foreground: oklch(0.985 0.001 106.423);
-  --popover: oklch(0.216 0.006 56.043);
-  --popover-foreground: oklch(0.985 0.001 106.423);
-  --primary: oklch(0.923 0.003 48.717);
-  --primary-foreground: oklch(0.216 0.006 56.043);
-  --secondary: oklch(0.268 0.007 34.298);
-  --secondary-foreground: oklch(0.985 0.001 106.423);
-  --muted: oklch(0.268 0.007 34.298);
-  --muted-foreground: oklch(0.709 0.01 56.259);
-  --accent: oklch(0.268 0.007 34.298);
-  --accent-foreground: oklch(0.985 0.001 106.423);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.553 0.013 58.071);
-  --chart-1: oklch(0.879 0.169 91.605);
-  --chart-2: oklch(0.769 0.188 70.08);
-  --chart-3: oklch(0.666 0.179 58.318);
-  --chart-4: oklch(0.555 0.163 48.998);
-  --chart-5: oklch(0.473 0.137 46.201);
-  --sidebar: oklch(0.216 0.006 56.043);
-  --sidebar-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-accent: oklch(0.268 0.007 34.298);
-  --sidebar-accent-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.553 0.013 58.071);
+  /* Warm near-blacks rather than blue-greys, so the palette keeps the same
+     temperature as the light theme instead of becoming a different product. */
+  --canvas: #141311;
+  --surface: #1c1b19;
+  --ink: #edebe7;
+  --ink-muted: #9a968f;
+  --hairline: #2c2a27;
+
+  --profit: #2ecc71;
+  --loss: #e86c52;
+
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+
+  --primary: #18a05f;
+  --primary-foreground: #0b0f0c;
+  --secondary: #262421;
+  --secondary-foreground: var(--ink);
+  --muted: #262421;
+  --muted-foreground: var(--ink-muted);
+  --accent: #2c2a27;
+  --accent-foreground: var(--ink);
+  --destructive: var(--loss);
+
+  --border: var(--hairline);
+  --input: var(--hairline);
+  --ring: #18a05f;
+
+  --chart-1: #18a05f;
+  --chart-2: #e86c52;
+  --chart-3: #9a968f;
+  --chart-4: #6e6b66;
+  --chart-5: #edebe7;
+
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: #18a05f;
+  --sidebar-primary-foreground: #0b0f0c;
+  --sidebar-accent: #2c2a27;
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: var(--hairline);
+  --sidebar-ring: #18a05f;
 }
 
 @layer base {
@@ -128,5 +167,44 @@
   }
   html {
     @apply font-sans;
+  }
+
+  /* --- Density and surface -------------------------------------------------
+     Applied through shadcn's data-slot attributes rather than by editing the
+     vendored components, so the whole visual direction lives in this file and
+     `shadcn add` never conflicts with it. */
+
+  /* Panels are defined by a hairline and nothing else. No shadow, no ring:
+     on a warm canvas a single line is enough to separate, and shadows would
+     imply a depth this layout does not have. */
+  [data-slot='card'] {
+    @apply border-border rounded-lg border shadow-none ring-0;
+  }
+
+  /* 36px rows at 13px. Tight enough to hold a trading week on one screen,
+     loose enough to scan without the columns fusing. */
+  [data-slot='table'] {
+    @apply text-[13px];
+  }
+  [data-slot='table-cell'] {
+    @apply px-3 py-2.5 align-middle;
+  }
+  [data-slot='table-head'] {
+    @apply text-muted-foreground h-auto px-3 pt-3 pb-2 align-bottom text-[11px] font-medium tracking-[0.08em] uppercase;
+  }
+
+  /* Every figure in the application is monospaced and tabular, so digits sit
+     in the same column from row to row and magnitudes are comparable by
+     length alone. */
+  .figure {
+    @apply font-mono tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+
+  /* Units, currency symbols and R suffixes are held back so the magnitude
+     reads first. Borrowed from the reference and the single biggest reason
+     its dense number columns stay calm. */
+  .unit {
+    @apply opacity-45;
   }
 }

@@ -5,7 +5,8 @@ import { apiGet } from '@/lib/api';
 import { MetricCard } from '@/components/metric-card';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { formatPercent, formatR, formatSignedMoney, pluralise, pnlToneClass } from '@/lib/format';
+import { Money, Percent, RMultiple } from '@/components/figure';
+import { pluralise } from '@/lib/format';
 
 /** Always reflect the database; a journal showing stale figures is worse than none. */
 export const dynamic = 'force-dynamic';
@@ -55,25 +56,29 @@ export default async function OverviewPage() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <MetricCard
           label="Realized PnL"
-          value={formatSignedMoney(totals.realizedPnl)}
-          tone={pnlToneClass(totals.realizedPnl)}
+          value={<Money value={totals.realizedPnl} />}
           hint={
-            returnPct === null
-              ? 'Return % needs a single account'
-              : `${formatPercent(returnPct)} of starting balance`
+            returnPct === null ? (
+              'Return % needs a single account'
+            ) : (
+              <>
+                <Percent value={returnPct} tone /> of starting balance
+              </>
+            )
           }
         />
         <MetricCard
           label="Total R"
-          value={formatR(totals.totalR)}
-          tone={pnlToneClass(totals.totalR)}
-          hint={`${formatR(totals.averageR)} average`}
+          value={<RMultiple value={totals.totalR} />}
+          hint={
+            <>
+              <RMultiple value={totals.averageR} tone={false} /> average
+            </>
+          }
         />
         <MetricCard
           label="Win rate"
-          value={
-            totals.winRate === null ? '—' : formatPercent(totals.winRate, 1, { signed: false })
-          }
+          value={<Percent value={totals.winRate} fractionDigits={1} signed={false} />}
           hint={`${totals.winners}W / ${totals.losers}L`}
         />
         <MetricCard
@@ -100,22 +105,18 @@ export default async function OverviewPage() {
           <div className="divide-border/60 border-border/60 divide-y rounded-lg border">
             {groups.slice(0, 10).map((group) => (
               <div key={group.key} className="flex items-center gap-4 px-4 py-2.5 text-sm">
-                <span className="w-28 font-mono tabular-nums">{group.key}</span>
+                <span className="figure w-28">{group.key}</span>
                 <Badge variant="secondary" className="tabular-nums">
                   {pluralise(group.summary.events, 'exit')}
                 </Badge>
-                <span className="text-muted-foreground tabular-nums">
+                <span className="text-muted-foreground figure">
                   {group.summary.winners}W / {group.summary.losers}L
                 </span>
-                <span
-                  className={`ml-auto font-mono tabular-nums ${pnlToneClass(group.summary.realizedPnl)}`}
-                >
-                  {formatSignedMoney(group.summary.realizedPnl)}
+                <span className="ml-auto">
+                  <Money value={group.summary.realizedPnl} />
                 </span>
-                <span
-                  className={`w-20 text-right font-mono tabular-nums ${pnlToneClass(group.summary.totalR)}`}
-                >
-                  {formatR(group.summary.totalR)}
+                <span className="w-20 text-right">
+                  <RMultiple value={group.summary.totalR} />
                 </span>
               </div>
             ))}

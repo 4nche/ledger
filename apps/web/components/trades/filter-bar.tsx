@@ -213,10 +213,15 @@ function FilterSelect({
   onChange: (value: string) => void;
   options: readonly { value: string; label: string }[];
 }) {
+  // Radix resolves the trigger label by scanning SelectContent, which is not
+  // mounted until the menu opens — so on first render it shows nothing. Passing
+  // the label explicitly makes the trigger correct on the server too.
+  const selected = options.find((option) => option.value === value);
+
   return (
     <Select value={value ?? ALL} onValueChange={onChange}>
       <SelectTrigger size="sm" className="w-auto min-w-[9rem]">
-        <SelectValue placeholder={label} />
+        <SelectValue placeholder={label}>{selected?.label ?? label}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectItem value={ALL}>{label}</SelectItem>

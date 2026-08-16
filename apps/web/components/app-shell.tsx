@@ -4,6 +4,7 @@ import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ApiStatus } from '@/components/api-status';
 import { TraderMenu } from '@/components/auth/trader-menu';
+import { ThemeToggle } from '@/components/theme-toggle';
 import type { Trader } from '@/lib/session';
 
 const NAV_ITEMS = [
@@ -45,6 +46,7 @@ export function AppShell({ children, trader }: { children: ReactNode; trader: Tr
                 New Position
               </Link>
             </Button>
+            <ThemeToggle />
             <TraderMenu trader={trader} />
           </div>
         </div>

@@ -12,7 +12,8 @@ import { PeriodGroup } from '@/components/trades/period-group';
 import { MetricCard } from '@/components/metric-card';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { formatPercent, formatR, formatSignedMoney, pluralise, pnlToneClass } from '@/lib/format';
+import { Money, Percent, RMultiple } from '@/components/figure';
+import { pluralise } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 
@@ -110,25 +111,29 @@ async function TradesResults({ params }: { params: SearchParams }) {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           label="Realized PnL"
-          value={formatSignedMoney(totals.realizedPnl)}
-          tone={pnlToneClass(totals.realizedPnl)}
+          value={<Money value={totals.realizedPnl} />}
           hint={
-            returnPct === null
-              ? 'Return % needs a single account'
-              : `${formatPercent(returnPct)} of starting balance`
+            returnPct === null ? (
+              'Return % needs a single account'
+            ) : (
+              <>
+                <Percent value={returnPct} tone /> of starting balance
+              </>
+            )
           }
         />
         <MetricCard
           label="Total R"
-          value={formatR(totals.totalR)}
-          tone={pnlToneClass(totals.totalR)}
-          hint={`${formatR(totals.averageR)} average`}
+          value={<RMultiple value={totals.totalR} />}
+          hint={
+            <>
+              <RMultiple value={totals.averageR} tone={false} /> average
+            </>
+          }
         />
         <MetricCard
           label="Win rate"
-          value={
-            totals.winRate === null ? '—' : formatPercent(totals.winRate, 1, { signed: false })
-          }
+          value={<Percent value={totals.winRate} fractionDigits={1} signed={false} />}
           hint={`${totals.winners}W / ${totals.losers}L${totals.scratches > 0 ? ` / ${totals.scratches}S` : ''}`}
         />
         <MetricCard

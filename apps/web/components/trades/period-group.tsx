@@ -9,16 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  formatDuration,
-  formatPercent,
-  formatPrice,
-  formatQuantity,
-  formatR,
-  formatSignedMoney,
-  pluralise,
-  pnlToneClass,
-} from '@/lib/format';
+import { Amount, Money, Percent, RBar, RMultiple } from '@/components/figure';
+import { formatDuration, pluralise } from '@/lib/format';
 
 /**
  * One table per period, as the spec requires — not one table with a date
@@ -79,18 +71,20 @@ export function PeriodGroup({ group, timeZone }: { group: PeriodGroupResponse; t
         </div>
 
         <dl className="text-muted-foreground flex flex-wrap items-baseline gap-x-5 gap-y-1 text-xs">
-          <Metric label={pluralise(summary.events, 'exit')} />
-          <Metric label={`${summary.winners}W / ${summary.losers}L`} />
+          <span>{pluralise(summary.events, 'exit')}</span>
+          <span className="figure">
+            {summary.winners}W / {summary.losers}L
+          </span>
           {summary.winRate !== null && (
-            <Metric label={`${formatPercent(summary.winRate, 1, { signed: false })} WR`} />
+            <span>
+              <Percent value={summary.winRate} fractionDigits={1} signed={false} /> WR
+            </span>
           )}
-          <Metric
-            label={formatSignedMoney(summary.realizedPnl)}
-            tone={pnlToneClass(summary.realizedPnl)}
-            emphasis
-          />
-          <Metric label={formatR(summary.totalR)} tone={pnlToneClass(summary.totalR)} emphasis />
-          <Metric label={`${formatR(summary.averageR)} avg`} />
+          <Money value={summary.realizedPnl} className="font-medium" />
+          <RMultiple value={summary.totalR} className="font-medium" />
+          <span>
+            <RMultiple value={summary.averageR} tone={false} /> avg
+          </span>
         </dl>
       </header>
 
@@ -103,12 +97,18 @@ export function PeriodGroup({ group, timeZone }: { group: PeriodGroupResponse; t
               <TableHead>Side</TableHead>
               <TableHead>Account</TableHead>
               <TableHead>Trader</TableHead>
-              <TableHead className="text-right">Basis</TableHead>
+              <TableHead className="text-right">
+                <Stacked label="Basis" qualifier="Avg entry" />
+              </TableHead>
               <TableHead className="text-right">Exit</TableHead>
               <TableHead className="text-right">Size</TableHead>
               <TableHead className="text-right">PnL</TableHead>
-              <TableHead className="text-right">PnL %</TableHead>
-              <TableHead className="text-right">R</TableHead>
+              <TableHead className="text-right">
+                <Stacked label="PnL %" qualifier="of balance" />
+              </TableHead>
+              <TableHead className="text-right">
+                <Stacked label="R" qualifier="vs risk" />
+              </TableHead>
               <TableHead className="text-right">Held</TableHead>
             </TableRow>
           </TableHeader>
@@ -143,32 +143,27 @@ export function PeriodGroup({ group, timeZone }: { group: PeriodGroupResponse; t
                   {item.accountName}
                 </TableCell>
                 <TableCell className="text-muted-foreground">{item.traderName}</TableCell>
-                <TableCell className="text-right font-mono tabular-nums">
-                  {formatPrice(item.averageEntryPrice)}
+                <TableCell className="text-right">
+                  <Amount value={item.averageEntryPrice} />
                 </TableCell>
-                <TableCell className="text-right font-mono tabular-nums">
-                  {formatPrice(item.exitPrice)}
+                <TableCell className="text-right">
+                  <Amount value={item.exitPrice} />
                 </TableCell>
-                <TableCell className="text-right font-mono tabular-nums">
-                  {formatQuantity(item.quantity)}
+                <TableCell className="text-right">
+                  <Amount value={item.quantity} />
                   {!item.closesPosition && (
-                    <span className="text-muted-foreground ml-1 text-xs">part</span>
+                    <span className="text-muted-foreground ml-1.5 text-[11px]">part</span>
                   )}
                 </TableCell>
-                <TableCell
-                  className={`text-right font-mono tabular-nums ${pnlToneClass(item.realizedPnl)}`}
-                >
-                  {formatSignedMoney(item.realizedPnl)}
+                <TableCell className="text-right">
+                  <Money value={item.realizedPnl} />
                 </TableCell>
-                <TableCell
-                  className={`text-right font-mono tabular-nums ${pnlToneClass(item.realizedPnl)}`}
-                >
-                  {formatPercent(item.realizedPnlPct)}
+                <TableCell className="text-right">
+                  <Percent value={item.realizedPnlPct} tone />
                 </TableCell>
-                <TableCell
-                  className={`text-right font-mono tabular-nums ${pnlToneClass(item.rMultiple)}`}
-                >
-                  {formatR(item.rMultiple)}
+                <TableCell className="w-24 text-right">
+                  <RMultiple value={item.rMultiple} />
+                  <RBar value={item.rMultiple} />
                 </TableCell>
                 <TableCell className="text-muted-foreground text-right whitespace-nowrap">
                   {formatDuration(item.holdingSeconds)}
@@ -182,12 +177,18 @@ export function PeriodGroup({ group, timeZone }: { group: PeriodGroupResponse; t
   );
 }
 
-function Metric({ label, tone, emphasis }: { label: string; tone?: string; emphasis?: boolean }) {
+/**
+ * A column heading whose second line carries a real qualifier — what the figure
+ * is measured against. Used only where that question actually arises; a second
+ * line with nothing to say would be decoration.
+ */
+function Stacked({ label, qualifier }: { label: string; qualifier: string }) {
   return (
-    <dd
-      className={`font-mono tabular-nums ${tone ?? ''} ${emphasis === true ? 'font-medium' : ''}`}
-    >
+    <span className="block leading-tight">
       {label}
-    </dd>
+      <span className="text-muted-foreground/70 block text-[10px] font-normal normal-case">
+        {qualifier}
+      </span>
+    </span>
   );
 }
